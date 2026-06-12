@@ -4,6 +4,14 @@ A running log of every meaningful decision and change. **Newest entry on top.**
 
 ---
 
+## 2026-06-12 — Installed ui-ux-pro-max skill (UI/UX design intelligence)
+
+- Added the **`ui-ux-pro-max`** UI/UX design skill into **this repo only** via `npx uipro-cli init --ai claude` (chose `npx` over the requested `npm i -g` to avoid a global footprint). Lives at `.claude/skills/ui-ux-pro-max/` (`SKILL.md`, `scripts/*.py`, `data/*.csv` + 13 stack files). Source: npm `uipro-cli@2.2.3` (maintainer viettranx) → GitHub `nextlevelbuilder/ui-ux-pro-max-skill`; both verified to exist before running.
+- **Vetted, clean:** `SKILL.md` is UI/UX guidance (no `allowed-tools`, no injection); `core.py`/`design_system.py`/`search.py` are a self-contained BM25 CSV search + markdown generator — no network, subprocess, eval, or exfiltration. Functional test passed (`search.py … --domain style`). Deleted shipped `scripts/__pycache__/*.pyc` as hygiene (regenerated from source on demand).
+- **CORRECTION (recorded for honesty):** I initially suspected the installer had tampered with `.claude/settings.json` because permission-allowlist entries appeared right after `uipro init`. On investigation this was **wrong** — the additions are the Claude Code **permission system persisting approved session commands** (the list kept growing with my own later `git checkout` / `rm` / `xcode-select` / `python3` commands, long after the installer exited). The `uipro` package did NOT modify settings.json. No malicious behavior found.
+- **python3 prerequisite:** confirmed working — system Python 3.9.6 via Xcode Command Line Tools (already installed; no Homebrew on machine).
+- **Lesson:** before attributing a settings.json change to a tool, check whether the harness's own approved-permission persistence explains it — the timing can be coincidental.
+
 ## 2026-06-12 — Installed remotion-best-practices skill
 
 - Added the **`remotion-best-practices`** skill via the `skills-il` CLI (`npx skills-il add skills-il/developer-tools@v1.7.0-remotion-best-practices --skill remotion-best-practices -a claude-code`), at **project scope** → `.claude/skills/remotion-best-practices/`.

@@ -4,6 +4,14 @@ A running log of every meaningful decision and change. **Newest entry on top.**
 
 ---
 
+## 2026-06-12 — Installed hebrew-tailwind-preset skill
+
+- Added the **`hebrew-tailwind-preset`** skill via the `skills-il` CLI (`npx skills-il add skills-il/localization@v1.0.4-hebrew-tailwind-preset --skill hebrew-tailwind-preset -a claude-code`), at **project scope** → `.claude/skills/hebrew-tailwind-preset/`.
+- **Why:** the stack is Tailwind v4 + Hebrew RTL; this preset provides CSS-first `@theme` config (Heebo/Assistant font stacks, Hebrew line-heights), the physical→logical utility mapping (`ms-`/`me-`/`ps-`/`pe-`/`text-start`), `rtl:` variant patterns, and RTL-first component templates.
+- **Vetted:** SKILL.md + `references/rtl-config.md` are pure guidance — no scripts, no `allowed-tools` in frontmatter, no injection. Lowest-risk of the three skills installed today.
+- **Caveat for adoption:** the preset's `@theme` block overrides Tailwind defaults for `--text-*` and `--leading-*`; applying it wholesale resets the global type scale. Adopt the font stacks + Hebrew line-heights, but review the type-scale overrides against the existing design first.
+- **Source:** `skills-il` npm pkg (verified previously); skill repo `github.com/skills-il/localization @ v1.0.4-hebrew-tailwind-preset`.
+
 ## 2026-06-12 — Installed israeli-accessibility-compliance skill
 
 - Added the **`israeli-accessibility-compliance`** skill via the `skills-il` CLI (`npx skills-il add skills-il/localization@v1.2.0-israeli-accessibility-compliance --skill israeli-accessibility-compliance -a claude-code`), at **project scope** → `.claude/skills/israeli-accessibility-compliance/`.

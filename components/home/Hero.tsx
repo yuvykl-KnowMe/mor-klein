@@ -12,9 +12,9 @@ export function Hero() {
               id="hero-heading"
               className="font-heading text-5xl font-extrabold leading-[1.08] sm:text-6xl lg:text-7xl"
             >
-              מרחב שקט לעצור בו, ולבחור מחדש
+              להאט, גם כשהכול דורש ממך להאיץ
             </h1>
-            {/* Hand-drawn underline flourish: decorative, sage, low opacity */}
+            {/* Hand-drawn underline flourish: decorative, slate accent, low opacity */}
             <svg
               aria-hidden="true"
               viewBox="0 0 300 22"
@@ -24,7 +24,7 @@ export function Hero() {
             >
               <path
                 d="M4 13c44-7 92 6 138 1 40-4 86-9 154 3"
-                stroke="#7C8C6E"
+                stroke="#5B7B8A"
                 strokeWidth="3"
                 strokeLinecap="round"
               />
@@ -32,9 +32,9 @@ export function Hero() {
           </div>
           <p className="max-w-xl text-lg text-ink-muted">
             אני מור קליין, פסיכותרפיסטית ועובדת סוציאלית קלינית (M.S.W). אני
-            מלווה נשים וגברים בשנות העשרים, השלושים והארבעים בצמתים של החיים:
-            קריירה, זוגיות והורות צעירה, בשיחות אונליין, בגישה אדלריאנית,
-            בקצב שלכם.
+            מלווה אנשים שהעבודה תובעת מהם הרבה: אנשי הייטק, מנהלות ומנהלים, ומי
+            שהעומס והלחץ כבר נכנסים איתם הביתה. נעבוד יחד בשיחות בזום, בקצב
+            שמתאים לחיים עמוסים.
           </p>
           <div className="flex flex-wrap items-center gap-4">
             <CtaLink href={BOOKING_URL}>לתיאום שיחת היכרות ללא עלות</CtaLink>

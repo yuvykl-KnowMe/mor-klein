@@ -20,25 +20,25 @@ const assistant = Assistant({
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "מור קליין | פסיכותרפיה אדלריאנית אונליין: קריירה, זוגיות והורות",
+    default: "מור קליין | פסיכותרפיה אדלריאנית בזום: קריירה, זוגיות והורות",
     template: `%s | ${SITE_NAME}`,
   },
   description:
-    "מור קליין, פסיכותרפיסטית ועובדת סוציאלית קלינית (M.S.W), מלווה אונליין בזום בגישה אדלריאנית, בצמתים של קריירה, זוגיות והורות צעירה. שיחת היכרות ראשונה ללא עלות.",
+    "מור קליין, פסיכותרפיסטית ועובדת סוציאלית קלינית (M.S.W), מלווה בזום בגישה אדלריאנית, בצמתים של קריירה, זוגיות והורות צעירה. שיחת היכרות ראשונה ללא עלות.",
   alternates: { canonical: "/" },
   openGraph: {
     type: "website",
     locale: "he_IL",
     url: "/",
     siteName: SITE_NAME,
-    title: "מור קליין | פסיכותרפיה אדלריאנית אונליין: קריירה, זוגיות והורות",
+    title: "מור קליין | פסיכותרפיה אדלריאנית בזום: קריירה, זוגיות והורות",
     description:
-      "מור קליין, פסיכותרפיסטית ועובדת סוציאלית קלינית (M.S.W), מלווה אונליין בזום בגישה אדלריאנית, בצמתים של קריירה, זוגיות והורות צעירה.",
+      "מור קליין, פסיכותרפיסטית ועובדת סוציאלית קלינית (M.S.W), מלווה בזום בגישה אדלריאנית, בצמתים של קריירה, זוגיות והורות צעירה.",
   },
 };
 
 export const viewport: Viewport = {
-  themeColor: "#F4EFE4",
+  themeColor: "#F5F0E8",
 };
 
 export default function RootLayout({
@@ -55,7 +55,7 @@ export default function RootLayout({
       <body className="flex min-h-full flex-col">
         <a
           href="#main"
-          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:start-4 focus:z-50 focus:rounded-full focus:bg-surface focus:px-5 focus:py-3 focus:font-medium focus:text-sage-deep"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:start-4 focus:z-50 focus:rounded-full focus:bg-surface focus:px-5 focus:py-3 focus:font-medium focus:text-accent-deep"
         >
           דילוג לתוכן הראשי
         </a>

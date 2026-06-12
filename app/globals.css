@@ -1,16 +1,17 @@
 @import "tailwindcss";
 
 @theme {
-  /* Single warm light theme, locked design tokens */
-  --color-cream: #f4efe4; /* page background */
-  --color-surface: #fbf8f1; /* cards / raised surfaces */
-  --color-ink: #2f2a22; /* body text */
-  --color-ink-muted: #6b6354; /* secondary text (5.18:1 on cream, AA pass) */
-  --color-sage: #7c8c6e; /* decorative only, 3.14:1, never text or button bg */
-  --color-sage-deep: #5e6e50; /* CTA bg + accent text (4.79:1, AA pass) */
-  --color-sage-deeper: #4d5a40; /* CTA hover */
-  --color-on-accent: #f4efe4; /* text on sage-deep */
-  --color-line: #e6decf; /* hairline borders */
+  /* Single warm light theme, slate-blue + warm-gold palette */
+  --color-sand: #f5f0e8; /* page background */
+  --color-surface: #ffffff; /* cards / raised surfaces */
+  --color-ink: #1e1e1e; /* body text */
+  --color-ink-muted: #5a5245; /* secondary text (6.7:1 on sand, AA pass) */
+  --color-accent: #5b7b8a; /* decorative only, 3.95:1, never text or button bg */
+  --color-accent-deep: #4a6675; /* CTA bg + accent text (5.3:1, AA pass) */
+  --color-accent-deeper: #3c5360; /* CTA hover */
+  --color-gold: #c4a97d; /* decorative warm fills (blobs, portrait) */
+  --color-on-accent: #f5f0e8; /* text on accent-deep */
+  --color-line: #e8e0d4; /* hairline borders */
 
   /* Hebrew needs taller leading than Latin defaults */
   --text-base--line-height: 1.7;
@@ -29,11 +30,11 @@
   }
 
   body {
-    @apply bg-cream text-ink font-sans;
+    @apply bg-sand text-ink font-sans;
   }
 
   :focus-visible {
-    outline: 2px solid var(--color-sage-deep);
+    outline: 2px solid var(--color-accent-deep);
     outline-offset: 2px;
   }
 

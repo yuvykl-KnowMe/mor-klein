@@ -8,8 +8,8 @@ const base =
   "inline-flex min-h-11 items-center justify-center rounded-full px-6 py-2 font-medium transition-colors";
 
 const variants = {
-  primary: "bg-sage-deep text-on-accent hover:bg-sage-deeper",
-  ghost: "border border-line text-sage-deep hover:bg-surface",
+  primary: "bg-accent-deep text-on-accent hover:bg-accent-deeper",
+  ghost: "border border-line text-accent-deep hover:bg-surface",
 };
 
 export function CtaLink({

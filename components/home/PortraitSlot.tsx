@@ -1,4 +1,5 @@
-// Intentional decorative composition standing in for Mor's portrait.
+// Intentional decorative composition standing in for Mor's portrait:
+// a continuous-line figure in slate over warm-gold organic blobs.
 // The wrapper's dimensions and radius are exactly where next/image drops in later.
 export function PortraitSlot() {
   return (
@@ -14,33 +15,34 @@ export function PortraitSlot() {
         xmlns="http://www.w3.org/2000/svg"
       >
         <defs>
-          <radialGradient id="portrait-glow" cx="50%" cy="38%" r="62%">
-            <stop offset="0%" stopColor="#7C8C6E" stopOpacity="0.28" />
-            <stop offset="100%" stopColor="#7C8C6E" stopOpacity="0" />
+          <radialGradient id="portrait-glow" cx="50%" cy="40%" r="62%">
+            <stop offset="0%" stopColor="#C4A97D" stopOpacity="0.4" />
+            <stop offset="100%" stopColor="#C4A97D" stopOpacity="0" />
           </radialGradient>
         </defs>
 
-        {/* Soft sage glow behind the figure */}
+        {/* Warm gold glow + grounding blobs */}
         <rect width="320" height="400" fill="url(#portrait-glow)" />
+        <circle cx="70" cy="328" r="128" fill="#C4A97D" opacity="0.32" />
+        <circle cx="268" cy="120" r="96" fill="#C4A97D" opacity="0.22" />
+        <ellipse cx="190" cy="300" rx="120" ry="96" fill="#C4A97D" opacity="0.18" />
 
-        {/* Grounding organic shapes */}
-        <circle cx="64" cy="340" r="120" fill="#7C8C6E" opacity="0.12" />
-        <circle cx="270" cy="120" r="92" fill="#7C8C6E" opacity="0.1" />
-
-        {/* Abstract serene figure: a quiet portrait suggestion */}
-        <circle cx="160" cy="158" r="52" fill="#5E6E50" opacity="0.18" />
-        <path
-          d="M70 400c0-58 40-104 90-104s90 46 90 104z"
-          fill="#5E6E50"
-          opacity="0.18"
-        />
-
-        {/* Delicate leaf sprig */}
-        <path
-          d="M232 250c-2 26-18 44-42 49 24 4 40 22 42 48 2-26 18-44 42-48-24-5-40-23-42-49z"
-          fill="#7C8C6E"
-          opacity="0.3"
-        />
+        {/* Continuous-line figure, single slate stroke */}
+        <g
+          stroke="#5B7B8A"
+          strokeWidth="2.25"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          opacity="0.8"
+        >
+          {/* head + neck + shoulders in one flowing contour */}
+          <path d="M133 196c-16-10-25-29-25-52 0-31 23-54 52-54s52 23 52 54c0 23-9 42-25 52 26 7 47 24 58 50 9 20 13 44 13 70H62c0-26 4-50 13-70 11-26 32-43 58-50z" />
+          {/* brow + nose, a quiet inner line */}
+          <path d="M138 96c8-7 18-10 22-10s14 3 22 10" />
+          <path d="M160 104v26c0 6-4 10-9 12" />
+          {/* calm mouth */}
+          <path d="M150 150c6 4 14 4 20 0" />
+        </g>
 
         {/* Matted inner frame */}
         <rect
@@ -49,8 +51,8 @@ export function PortraitSlot() {
           width="292"
           height="372"
           rx="36"
-          stroke="#5E6E50"
-          strokeOpacity="0.22"
+          stroke="#5B7B8A"
+          strokeOpacity="0.25"
           strokeWidth="1.5"
         />
       </svg>

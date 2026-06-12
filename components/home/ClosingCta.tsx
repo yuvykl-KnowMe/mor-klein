@@ -21,7 +21,7 @@ export function ClosingCta() {
           או במייל:{" "}
           <a
             href={`mailto:${EMAIL}`}
-            className="inline-flex min-h-11 items-center text-sage-deep underline underline-offset-4 hover:text-sage-deeper"
+            className="inline-flex min-h-11 items-center text-accent-deep underline underline-offset-4 hover:text-accent-deeper"
             dir="ltr"
           >
             {EMAIL}

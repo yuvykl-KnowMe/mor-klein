@@ -4,6 +4,13 @@ A running log of every meaningful decision and change. **Newest entry on top.**
 
 ---
 
+## 2026-06-12 — Committed setup; adopted autonomous git workflow
+
+- Committed the cleanup + CLAUDE.md + PROJECT_JOURNAL.md work to `main` (`da957fe`) and pushed to GitHub (yuvykl-KnowMe/mor-klein). Verified local HEAD matches remote `main`.
+- **Workflow going forward:** after each meaningful chunk of work, commit and push autonomously with a clear English message and log it here. Git is no longer managed manually by the user.
+
+---
+
 ## 2026-06-12 — Project setup & de-boilerplating
 
 Cleaned up the Create-Next-App starter and established the project's source of truth.

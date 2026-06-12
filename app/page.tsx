@@ -11,18 +11,18 @@ import {
   TITLE_PROFESSION,
 } from "@/lib/site";
 
-// Only true, confirmed facts — no address, phone, hours, prices or ratings.
+// Only true, confirmed facts. No address, phone, hours, prices or ratings.
 const jsonLd = {
   "@context": "https://schema.org",
   "@graph": [
     {
       "@type": "ProfessionalService",
       "@id": `${SITE_URL}/#practice`,
-      name: `${SITE_NAME} — פסיכותרפיה`,
+      name: `${SITE_NAME}, פסיכותרפיה`,
       url: SITE_URL,
       email: EMAIL,
       description:
-        "פסיכותרפיה אדלריאנית אונליין בזום — ליווי בצמתים של קריירה, זוגיות והורות צעירה.",
+        "פסיכותרפיה אדלריאנית אונליין בזום, ליווי בצמתים של קריירה, זוגיות והורות צעירה.",
       serviceType: [
         "פסיכותרפיה",
         "ליווי זוגי",

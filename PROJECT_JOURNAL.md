@@ -4,6 +4,18 @@ A running log of every meaningful decision and change. **Newest entry on top.**
 
 ---
 
+## 2026-06-12 — Homepage v1 built (design locked: cream + sage, Heebo/Assistant)
+
+- Replaced the Stage-1 placeholder with the full production **homepage**: hero (with decorative portrait slot for Mor's future photo), three focus areas (career / couples / early parenthood), Adlerian-approach teaser, online-via-Zoom-as-advantage, closing CTA. All real Hebrew copy, drafted per copy ethics (always "פסיכותרפיסטית" + "עובדת סוציאלית קלינית (M.S.W)", never the forbidden title; no superlatives, no testimonials) — to be refined with Mor.
+- **Theme:** locked tokens baked into Tailwind v4 `@theme` in `app/globals.css` (cream `#F4EFE4`, surface `#FBF8F1`, ink `#2F2A22`, ink-muted `#6B6354`, sage `#7C8C6E`, sage-deep `#5E6E50`, on-accent, line `#E6DECF`). Removed dark-mode swap (single warm light theme, `color-scheme: light`). Hebrew leading 1.7 baked into base/lg text sizes. Flat design — zero shadows; surfaces separate via `bg-surface` + `border-line`.
+- **Contrast decision (computed):** on-accent on sage = 3.14:1 → **fails AA**, so sage is decorative-only (illustration/icons); all CTAs and accent text use sage-deep (4.79:1, passes). Added `sage-deeper #4D5A40` for hover.
+- **Fonts:** Heebo (headings) + Assistant (body) via `next/font/google`, hebrew+latin subsets, CSS-variable strategy wired into `@theme inline`.
+- **Structure:** new `lib/site.ts` (site constants; `BOOKING_URL = "#contact"` placeholder — Cal.com swap is a one-line change), `components/site/{Header,Footer}.tsx`, `components/ui/CtaLink.tsx`, `components/home/{Hero,PortraitSlot,FocusAreas,Approach,OnlineTherapy,ClosingCta}.tsx`. All server components, fully static prerender.
+- **SEO/GEO:** real Hebrew title + description, title template for future pages, `metadataBase`, canonical, OG (`he_IL`), separate `viewport` export (Next 16), JSON-LD `@graph` of `ProfessionalService` + `Person` (cross-linked `@id`s; only true facts — deliberately no address/phone/hours/prices/ratings since the practice is online-only).
+- **Accessibility (IS 5568):** skip link, landmarks, one H1 + proper hierarchy, logical properties only (`ms-/me-/ps-/pe-`), global `:focus-visible` sage-deep ring, 44px touch targets, smooth scroll only under `prefers-reduced-motion: no-preference`, decorative SVGs `aria-hidden`.
+- **Verified:** `next build` → `○ /` static, lint clean, rendered HTML has 1×`<h1>`, valid JSON-LD, `og:locale he_IL`, canonical; greps clean for physical-direction classes and the forbidden title.
+- **Deferred (next phases):** accessibility-statement page + footer link (required by IS 5568 before launch marketing), OG image, robots.txt + sitemap, Cal.com booking URL swap, Mor's portrait photo into the hero slot, copy refinement with Mor.
+
 ## 2026-06-12 — Installed hebrew-seo-geo-toolkit skill
 
 - Added the **`hebrew-seo-geo-toolkit`** skill via the `skills-il` CLI (`npx skills-il add skills-il/marketing-growth@v2.2.0-hebrew-seo-geo-toolkit --skill hebrew-seo-geo-toolkit -a claude-code`), at **project scope** → `.claude/skills/hebrew-seo-geo-toolkit/`.

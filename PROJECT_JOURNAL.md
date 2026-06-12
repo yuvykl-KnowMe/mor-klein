@@ -4,6 +4,14 @@ A running log of every meaningful decision and change. **Newest entry on top.**
 
 ---
 
+## 2026-06-12 — Installed israeli-accessibility-compliance skill
+
+- Added the **`israeli-accessibility-compliance`** skill via the `skills-il` CLI (`npx skills-il add skills-il/localization@v1.2.0-israeli-accessibility-compliance --skill israeli-accessibility-compliance -a claude-code`), at **project scope** → `.claude/skills/israeli-accessibility-compliance/`.
+- **Why:** mor-klein.co.il is a public-facing Hebrew RTL site, so IS 5568 / Equal Rights for Persons with Disabilities accessibility compliance is legally mandatory (civil statutory damages up to 50k NIS + Commission administrative penalties). Skill covers exemption tiers, the 60-day cure period, accessibility coordinator role, Hebrew screen-reader/RTL ARIA patterns, the mandatory Hatzaharat Negishot statement, and a Regulation-35 accessibility-widget guide.
+- **Vetted before trusting:** SKILL.md is pure guidance with no injection; `scripts/audit_a11y.py` is benign — one outbound `requests.get()` to a user-supplied URL (its purpose), BeautifulSoup parse, no subprocess/eval/exfiltration.
+- **Heads-up:** the skill's frontmatter declares `allowed-tools: Bash(python:*) Bash(pip:*)`, so when active it's pre-authorized to run python/pip; the audit script needs `requests` + `beautifulsoup4` (install into a venv, not system Python). `references/widget-implementation.md` is copy-pasteable TS/React — review before lifting into the site.
+- **Source:** `skills-il` npm pkg (verified previously); skill repo `github.com/skills-il/localization @ v1.2.0-israeli-accessibility-compliance`.
+
 ## 2026-06-12 — Installed israeli-privacy-shield compliance skill
 
 - Added the **`israeli-privacy-shield`** skill via the `skills-il` CLI (`npx skills-il add skills-il/security-compliance@v1.4.1-israeli-privacy-shield --skill israeli-privacy-shield -a claude-code`), installed at **project scope** → `.claude/skills/israeli-privacy-shield/`. Also created `skills-lock.json` at the repo root.

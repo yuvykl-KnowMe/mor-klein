@@ -1,6 +1,11 @@
 {
   "version": 1,
   "skills": {
+    "israeli-accessibility-compliance": {
+      "source": "skills-il/localization",
+      "sourceType": "github",
+      "computedHash": "475cd751ec731a8ed2917bf611661a95690cb10fd59a2bd7e62b0133c0437b97"
+    },
     "israeli-privacy-shield": {
       "source": "skills-il/security-compliance",
       "sourceType": "github",

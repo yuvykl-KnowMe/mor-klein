@@ -3,6 +3,8 @@ import { ClosingCta } from "@/components/home/ClosingCta";
 import { FocusAreas } from "@/components/home/FocusAreas";
 import { Hero } from "@/components/home/Hero";
 import { OnlineTherapy } from "@/components/home/OnlineTherapy";
+import { Blob, Divider, LineArc } from "@/components/decor/Decor";
+import { Reveal } from "@/components/decor/Reveal";
 import {
   EMAIL,
   SITE_NAME,
@@ -53,15 +55,34 @@ const jsonLd = {
 
 export default function Home() {
   return (
-    <main id="main" className="flex-1">
+    <main id="main" className="relative isolate flex-1 overflow-hidden">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
+
+      {/* Woven background decoration, drifting gently on scroll */}
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10">
+        <Blob variant="up" className="-end-16 top-[5%] h-72 w-72" />
+        <Blob variant="down" className="-start-20 top-[28%] h-64 w-64" />
+        <Blob variant="up" className="-end-24 top-[56%] h-80 w-80" />
+        <Blob variant="down" className="-start-16 top-[80%] h-64 w-64" />
+        <Reveal aria-hidden className="absolute start-[5%] top-[22%] w-44 rotate-6">
+          <LineArc />
+        </Reveal>
+        <Reveal aria-hidden className="absolute end-[7%] top-[66%] w-40 -rotate-6">
+          <LineArc />
+        </Reveal>
+      </div>
+
       <Hero />
+      <Divider />
       <FocusAreas />
+      <Divider />
       <Approach />
+      <Divider />
       <OnlineTherapy />
+      <Divider />
       <ClosingCta />
     </main>
   );

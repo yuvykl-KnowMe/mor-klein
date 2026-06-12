@@ -42,5 +42,52 @@
     html {
       scroll-behavior: smooth;
     }
+
+    /* Scroll reveal: decorative layers fade + rise in once on entry.
+       Without no-preference (i.e. reduced motion), elements stay visible. */
+    [data-reveal] {
+      opacity: 0;
+      transform: translateY(14px);
+      transition:
+        opacity 0.9s ease,
+        transform 0.9s ease;
+    }
+
+    [data-reveal][data-visible] {
+      opacity: 1;
+      transform: none;
+    }
+
+    /* Gentle continuous parallax for background blobs, compositor-driven.
+       Progressive enhancement: static where scroll timelines are unsupported. */
+    @supports (animation-timeline: scroll()) {
+      .drift-up {
+        animation: drift-up linear both;
+        animation-timeline: scroll(root);
+      }
+
+      .drift-down {
+        animation: drift-down linear both;
+        animation-timeline: scroll(root);
+      }
+    }
+  }
+}
+
+@keyframes drift-up {
+  from {
+    transform: translateY(36px);
+  }
+  to {
+    transform: translateY(-36px);
+  }
+}
+
+@keyframes drift-down {
+  from {
+    transform: translateY(-36px);
+  }
+  to {
+    transform: translateY(36px);
   }
 }

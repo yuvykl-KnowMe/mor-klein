@@ -1,59 +1,66 @@
-// Intentional decorative composition standing in for Mor's portrait:
-// a continuous-line figure in slate over warm-gold organic blobs.
-// The wrapper's dimensions and radius are exactly where next/image drops in later.
+import Image from "next/image";
+import portrait from "@/public/mor-portrait.png";
+
+// Mor's portrait as the focal point, set inside the brand art:
+// gold organic blobs and a slate continuous-line accent frame the photo.
 export function PortraitSlot() {
   return (
-    <div
-      aria-hidden="true"
-      className="relative mx-auto aspect-[4/5] w-64 overflow-hidden rounded-[2.75rem] border border-line bg-surface sm:mx-0 sm:w-80 lg:w-[22rem]"
-    >
-      <svg
-        viewBox="0 0 320 400"
-        className="h-full w-full"
-        fill="none"
-        preserveAspectRatio="xMidYMid slice"
-        xmlns="http://www.w3.org/2000/svg"
+    <div className="relative mx-auto w-64 sm:mx-0 sm:w-72 lg:w-80">
+      {/* Brand art bleeding around the photo */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -inset-7 -z-10"
       >
-        <defs>
-          <radialGradient id="portrait-glow" cx="50%" cy="40%" r="62%">
-            <stop offset="0%" stopColor="#C4A97D" stopOpacity="0.4" />
-            <stop offset="100%" stopColor="#C4A97D" stopOpacity="0" />
-          </radialGradient>
-        </defs>
-
-        {/* Warm gold glow + grounding blobs */}
-        <rect width="320" height="400" fill="url(#portrait-glow)" />
-        <circle cx="70" cy="328" r="128" fill="#C4A97D" opacity="0.32" />
-        <circle cx="268" cy="120" r="96" fill="#C4A97D" opacity="0.22" />
-        <ellipse cx="190" cy="300" rx="120" ry="96" fill="#C4A97D" opacity="0.18" />
-
-        {/* Continuous-line figure, single slate stroke */}
-        <g
-          stroke="#5B7B8A"
-          strokeWidth="2.25"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          opacity="0.8"
+        <svg
+          viewBox="0 0 360 440"
+          className="h-full w-full"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
         >
-          {/* head + neck + shoulders in one flowing contour */}
-          <path d="M133 196c-16-10-25-29-25-52 0-31 23-54 52-54s52 23 52 54c0 23-9 42-25 52 26 7 47 24 58 50 9 20 13 44 13 70H62c0-26 4-50 13-70 11-26 32-43 58-50z" />
-          {/* brow + nose, a quiet inner line */}
-          <path d="M138 96c8-7 18-10 22-10s14 3 22 10" />
-          <path d="M160 104v26c0 6-4 10-9 12" />
-          {/* calm mouth */}
-          <path d="M150 150c6 4 14 4 20 0" />
-        </g>
+          <circle cx="86" cy="360" r="120" fill="#C4A97D" opacity="0.3" />
+          <circle cx="300" cy="96" r="92" fill="#C4A97D" opacity="0.22" />
+          <ellipse cx="250" cy="350" rx="110" ry="86" fill="#C4A97D" opacity="0.16" />
+          {/* slate continuous line hugging the frame */}
+          <path
+            d="M40 120c-18 70-14 150 16 220"
+            stroke="#5B7B8A"
+            strokeWidth="2.25"
+            strokeLinecap="round"
+            opacity="0.5"
+          />
+          <path
+            d="M324 130c16 64 12 138-14 204"
+            stroke="#5B7B8A"
+            strokeWidth="2.25"
+            strokeLinecap="round"
+            opacity="0.4"
+          />
+        </svg>
+      </div>
 
-        {/* Matted inner frame */}
-        <rect
-          x="14"
-          y="14"
-          width="292"
-          height="372"
-          rx="36"
+      {/* The photo, focal point */}
+      <div className="relative aspect-[4/5] overflow-hidden rounded-[2.75rem] border border-line bg-surface">
+        <Image
+          src={portrait}
+          alt="מור קליין"
+          priority
+          sizes="(max-width: 640px) 16rem, (max-width: 1024px) 18rem, 20rem"
+          className="h-full w-full object-cover"
+        />
+      </div>
+
+      {/* Small slate line flourish at the lower corner */}
+      <svg
+        aria-hidden="true"
+        viewBox="0 0 80 40"
+        fill="none"
+        className="pointer-events-none absolute -bottom-5 start-6 w-20 opacity-50"
+      >
+        <path
+          d="M4 28c18-12 40-14 72-6"
           stroke="#5B7B8A"
-          strokeOpacity="0.25"
-          strokeWidth="1.5"
+          strokeWidth="2.5"
+          strokeLinecap="round"
         />
       </svg>
     </div>

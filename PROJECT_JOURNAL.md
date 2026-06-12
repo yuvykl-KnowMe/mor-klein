@@ -4,6 +4,14 @@ A running log of every meaningful decision and change. **Newest entry on top.**
 
 ---
 
+## 2026-06-12 — Installed hebrew-seo-geo-toolkit skill
+
+- Added the **`hebrew-seo-geo-toolkit`** skill via the `skills-il` CLI (`npx skills-il add skills-il/marketing-growth@v2.2.0-hebrew-seo-geo-toolkit --skill hebrew-seo-geo-toolkit -a claude-code`), at **project scope** → `.claude/skills/hebrew-seo-geo-toolkit/`.
+- **Why:** directly relevant to mor-klein.co.il — Hebrew SEO + GEO (AI-search optimization) for `.co.il`: keyword research, Hebrew morphology, JSON-LD/Israeli-business schema, EEAT, GEO methods, AI-bot/robots/sitemap audit.
+- **Vetted closely (11 executable scripts — highest script count so far):** `credential.py` reads `DATAFORSEO_LOGIN`/`DATAFORSEO_PASSWORD` from env only (no hardcoded secrets, no file reads); `dataforseo_api.py` sends them via Basic auth to `https://api.dataforseo.com/v3` and nowhere else. URL scan across all scripts found only `api.dataforseo.com` + an `example.com` placeholder — no exfil endpoints, no subprocess/os.system/eval/smtplib/sockets. `seo_audit.py` just fetches a user-supplied URL + its robots/sitemap. SKILL.md frontmatter has no `allowed-tools`.
+- **Usage notes:** DataForSEO scripts need the user's own paid API creds in env; the SEO audit + schema/checklist references work with no API setup.
+- **Source:** `skills-il` npm pkg (verified previously); skill repo `github.com/skills-il/marketing-growth @ v2.2.0-hebrew-seo-geo-toolkit`.
+
 ## 2026-06-12 — Installed ui-ux-pro-max skill (UI/UX design intelligence)
 
 - Added the **`ui-ux-pro-max`** UI/UX design skill into **this repo only** via `npx uipro-cli init --ai claude` (chose `npx` over the requested `npm i -g` to avoid a global footprint). Lives at `.claude/skills/ui-ux-pro-max/` (`SKILL.md`, `scripts/*.py`, `data/*.csv` + 13 stack files). Source: npm `uipro-cli@2.2.3` (maintainer viettranx) → GitHub `nextlevelbuilder/ui-ux-pro-max-skill`; both verified to exist before running.

@@ -5,6 +5,8 @@
 ## Client & Identity
 - **Client:** Mor Klein
 - **Domain:** mor-klein.co.il
+  - Registered at **livedns.co.il**, connected to Vercel, and **live in production** (valid configuration; `www` redirects to the apex).
+  - Already wired up — **do not re-add the domain in Vercel.**
 - **Pro email:** mor@mor-klein.co.il (Cloudflare Email Routing → Mor's Gmail)
 
 ## Repositories & Hosting

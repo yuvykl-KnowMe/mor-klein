@@ -4,6 +4,15 @@ A running log of every meaningful decision and change. **Newest entry on top.**
 
 ---
 
+## 2026-06-12 — Domain live in production
+
+- **mor-klein.co.il** is purchased and registered at **livedns.co.il**.
+- DNS is wired to **Vercel** with a valid configuration; `www` redirects to the apex.
+- The domain is serving the placeholder homepage ("מור קליין" / "אתר בהקמה") in production.
+- No further Vercel domain setup needed — documented in CLAUDE.md so it isn't re-added.
+
+---
+
 ## 2026-06-12 — Committed setup; adopted autonomous git workflow
 
 - Committed the cleanup + CLAUDE.md + PROJECT_JOURNAL.md work to `main` (`da957fe`) and pushed to GitHub (yuvykl-KnowMe/mor-klein). Verified local HEAD matches remote `main`.

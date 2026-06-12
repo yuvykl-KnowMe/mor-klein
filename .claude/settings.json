@@ -4,7 +4,10 @@
       "Bash(npm run *)",
       "Bash(git add *)",
       "Bash(git commit *)",
-      "Bash([ -f \"$F\" ])"
+      "Bash([ -f \"$F\" ])",
+      "Bash(git push *)",
+      "Bash(git ls-remote *)",
+      "Bash(echo \"remote: $\\(git ls-remote origin -h refs/heads/main)"
     ]
   }
 }

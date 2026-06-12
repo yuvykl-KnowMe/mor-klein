@@ -4,6 +4,14 @@ A running log of every meaningful decision and change. **Newest entry on top.**
 
 ---
 
+## 2026-06-12 — Installed remotion-best-practices skill
+
+- Added the **`remotion-best-practices`** skill via the `skills-il` CLI (`npx skills-il add skills-il/developer-tools@v1.7.0-remotion-best-practices --skill remotion-best-practices -a claude-code`), at **project scope** → `.claude/skills/remotion-best-practices/`.
+- **What it is:** best practices for Remotion (programmatic React video) with strong Hebrew/RTL coverage — fonts, bidi, RTL captions/typewriter, voiceover (ElevenLabs), charts, maps, rendering (local + Lambda). 40+ on-demand rule files + 3 `.tsx` example components.
+- **Vetted:** scanned SKILL.md + all rules/assets for risky patterns. Clean — only benign hits: a commented-out `execSync('ffmpeg …')` example, and standard `process.env.*` API-key reads (ElevenLabs/Mapbox from `.env`). No injection, no exfiltration, no `allowed-tools` in frontmatter.
+- **Fit / caveats:** more tangential than the privacy/a11y/tailwind skills — it's for generating *video* content (social/promo), not the site itself. Licensing: Remotion is free for orgs ≤3 employees; **4+ requires a paid Company License** (remotion.pro). Voiceover/maps need the user's own API keys in `.env`.
+- **Source:** `skills-il` npm pkg (verified previously); skill repo `github.com/skills-il/developer-tools @ v1.7.0-remotion-best-practices`.
+
 ## 2026-06-12 — Installed hebrew-tailwind-preset skill
 
 - Added the **`hebrew-tailwind-preset`** skill via the `skills-il` CLI (`npx skills-il add skills-il/localization@v1.0.4-hebrew-tailwind-preset --skill hebrew-tailwind-preset -a claude-code`), at **project scope** → `.claude/skills/hebrew-tailwind-preset/`.

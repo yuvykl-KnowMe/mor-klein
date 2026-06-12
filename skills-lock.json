@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "skills": {
+    "israeli-privacy-shield": {
+      "source": "skills-il/security-compliance",
+      "sourceType": "github",
+      "computedHash": "6abffa414f3aa0406684cec01e61ef4ea0549b0e77cfc08f1ec236d1351dce78"
+    }
+  }
+}

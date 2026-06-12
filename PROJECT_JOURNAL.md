@@ -4,6 +4,16 @@ A running log of every meaningful decision and change. **Newest entry on top.**
 
 ---
 
+## 2026-06-12 — Installed israeli-privacy-shield compliance skill
+
+- Added the **`israeli-privacy-shield`** skill via the `skills-il` CLI (`npx skills-il add skills-il/security-compliance@v1.4.1-israeli-privacy-shield --skill israeli-privacy-shield -a claude-code`), installed at **project scope** → `.claude/skills/israeli-privacy-shield/`. Also created `skills-lock.json` at the repo root.
+- **Why:** Mor Klein is an Israeli business handling client personal data; this skill provides Privacy Protection Law / Amendment 13 (effective 2025-08-14) compliance guidance — security levels, database registration, consent, cross-border transfers, 72h breach notification, DSR workflow, DPIA, minors' data, plus a consent-banner implementation guide.
+- **Vetted before trusting** (skills run with full agent permissions): SKILL.md is pure domain guidance with no hidden/injection directives; `scripts/compliance_checker.py` is self-contained (argparse + json, no network/subprocess/eval, no filesystem writes beyond an explicit `--output`).
+- **Known caveat:** `compliance_checker.py` still applies the pre-Amendment registration rule (10k+ records AND sensitive ⇒ register), which Amendment 13 narrowed — it over-reports registration need vs. the skill's own SKILL.md. Treat the script's registration flag as conservative, not authoritative.
+- **Source:** `skills-il` npm package (v1.10.0, maintainer yootech, agentskills.co.il); skill repo `github.com/skills-il/security-compliance @ v1.4.1-israeli-privacy-shield`. `skills-il` package existence + provenance verified before install.
+
+---
+
 ## 2026-06-12 — Domain live in production
 
 - **mor-klein.co.il** is purchased and registered at **livedns.co.il**.

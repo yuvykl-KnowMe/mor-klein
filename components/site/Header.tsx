@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { CtaLink } from "@/components/ui/CtaLink";
 import { BOOKING_URL, SITE_NAME } from "@/lib/site";
-import logo from "@/public/logo-mor.png";
+import logo from "@/public/mor-logo-horizontal.png";
 
 export function Header() {
   return (
@@ -13,8 +13,8 @@ export function Header() {
             src={logo}
             alt={SITE_NAME}
             priority
-            className="h-9 w-auto"
-            sizes="120px"
+            className="h-10 w-auto sm:h-12"
+            sizes="160px"
           />
         </Link>
         <CtaLink href={BOOKING_URL}>שיחת היכרות</CtaLink>

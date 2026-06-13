@@ -26,6 +26,15 @@ export const metadata: Metadata = {
   description:
     "מור קליין, פסיכותרפיסטית ועובדת סוציאלית קלינית (M.S.W), מלווה בזום בגישה אדלריאנית, בצמתים של קריירה, זוגיות והורות צעירה. שיחת היכרות ראשונה ללא עלות.",
   alternates: { canonical: "/" },
+  icons: {
+    icon: [
+      { url: "/favicon/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+      { url: "/favicon/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+    ],
+    shortcut: "/favicon/favicon.ico",
+    apple: "/favicon/apple-touch-icon.png",
+  },
+  manifest: "/favicon/site.webmanifest",
   openGraph: {
     type: "website",
     locale: "he_IL",

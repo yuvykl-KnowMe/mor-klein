@@ -62,6 +62,13 @@ export default function RootLayout({
       className={`${heebo.variable} ${assistant.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">
+        {/* Mark JS as available before paint, so reveal animations only hide
+            content when JS is present to reveal it (no-JS keeps it visible). */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: "document.documentElement.classList.add('js')",
+          }}
+        />
         <a
           href="#main"
           className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:start-4 focus:z-50 focus:rounded-full focus:bg-surface focus:px-5 focus:py-3 focus:font-medium focus:text-accent-deep"

@@ -1,38 +1,38 @@
 import type { ReactNode } from "react";
+import { Parallax } from "@/components/decor/Parallax";
 import { Reveal } from "@/components/decor/Reveal";
 
-// Absolutely-positioned decorative item: outer element carries the parallax
-// drift, inner Reveal carries the fade-in. Keeping the two transforms on
-// separate elements avoids them clobbering each other.
+// Absolutely-positioned decorative item. The Parallax wrapper carries the
+// scroll drift; the optional Reveal carries the fade-in. Rotation/mirroring
+// lives on the inner SVG, so the three transforms never collide.
 export function Float({
   className = "",
-  drift = "",
+  speed = 0,
+  reveal = true,
   children,
 }: {
   className?: string;
-  drift?: string;
+  speed?: number;
+  reveal?: boolean;
   children: ReactNode;
 }) {
   return (
-    <div aria-hidden="true" className={`absolute ${drift} ${className}`}>
-      <Reveal aria-hidden>{children}</Reveal>
-    </div>
+    <Parallax
+      aria-hidden="true"
+      speed={speed}
+      className={`pointer-events-none absolute ${className}`}
+    >
+      {reveal ? <Reveal aria-hidden>{children}</Reveal> : children}
+    </Parallax>
   );
 }
 
-// Soft warm-gold blob. `variant` controls the gentle scroll parallax
-// direction (drift-* classes are gated on prefers-reduced-motion in globals.css).
-export function Blob({
-  className = "",
-  variant = "up",
-}: {
-  className?: string;
-  variant?: "up" | "down";
-}) {
+// Soft warm-gold blob that fills its (parallax) wrapper.
+export function Blob({ className = "" }: { className?: string }) {
   return (
     <div
       aria-hidden="true"
-      className={`pointer-events-none absolute rounded-full drift-${variant} ${className}`}
+      className={`h-full w-full rounded-full ${className}`}
       style={{
         background:
           "radial-gradient(circle, rgba(196,169,125,0.32), rgba(196,169,125,0) 70%)",

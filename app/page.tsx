@@ -4,6 +4,7 @@ import { FocusAreas } from "@/components/home/FocusAreas";
 import { Hero } from "@/components/home/Hero";
 import { OnlineTherapy } from "@/components/home/OnlineTherapy";
 import { Blob, Divider, Float, LineArc } from "@/components/decor/Decor";
+import { Reveal } from "@/components/decor/Reveal";
 import { Branch, Dots, Leaf, Scribble, Swirl } from "@/components/decor/WabiSabi";
 import {
   EMAIL,
@@ -62,48 +63,66 @@ export default function Home() {
       />
 
       {/* Woven background decoration: soft gold blobs + delicate slate line
-          motifs, fading in and drifting gently on scroll */}
+          motifs, fading in and drifting gently on scroll (JS parallax) */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10">
-        <Blob variant="up" className="-end-16 top-[5%] h-72 w-72" />
-        <Blob variant="down" className="-start-20 top-[28%] h-64 w-64" />
-        <Blob variant="up" className="-end-24 top-[56%] h-80 w-80" />
-        <Blob variant="down" className="-start-16 top-[80%] h-64 w-64" />
+        <Float className="-end-16 top-[5%] h-72 w-72" speed={0.1} reveal={false}>
+          <Blob />
+        </Float>
+        <Float className="-start-20 top-[28%] h-64 w-64" speed={-0.08} reveal={false}>
+          <Blob />
+        </Float>
+        <Float className="-end-24 top-[56%] h-80 w-80" speed={0.12} reveal={false}>
+          <Blob />
+        </Float>
+        <Float className="-start-16 top-[80%] h-64 w-64" speed={-0.09} reveal={false}>
+          <Blob />
+        </Float>
 
-        <Float className="start-[3%] top-[7%] w-24 opacity-50" drift="drift-soft-down">
+        <Float className="start-[3%] top-[7%] w-24 opacity-50" speed={-0.07}>
           <Leaf className="-rotate-6" />
         </Float>
-        <Float className="end-[4%] top-[11%] w-28 opacity-45" drift="drift-soft-up">
+        <Float className="end-[4%] top-[11%] w-28 opacity-45" speed={0.09}>
           <Branch />
         </Float>
-        <Float className="start-[13%] top-[19%] w-10 opacity-60">
+        <Float className="start-[13%] top-[19%] w-10 opacity-60" speed={0.05}>
           <Dots />
         </Float>
-        <Float className="start-[6%] top-[40%] w-44 opacity-40" drift="drift-soft-up">
+        <Float className="start-[6%] top-[40%] w-44 opacity-40" speed={0.08}>
           <LineArc className="rotate-3" />
         </Float>
-        <Float className="end-[5%] top-[45%] w-40 opacity-45" drift="drift-soft-down">
+        <Float className="end-[5%] top-[45%] w-40 opacity-45" speed={-0.1}>
           <Swirl />
         </Float>
-        <Float className="end-[12%] top-[62%] w-9 opacity-55">
+        <Float className="end-[12%] top-[62%] w-9 opacity-55" speed={-0.06}>
           <Dots />
         </Float>
-        <Float className="start-[5%] top-[72%] w-28 opacity-40" drift="drift-soft-up">
+        <Float className="start-[5%] top-[72%] w-28 opacity-40" speed={0.09}>
           <Scribble className="rotate-6" />
         </Float>
-        <Float className="end-[6%] top-[88%] w-24 opacity-40" drift="drift-soft-down">
+        <Float className="end-[6%] top-[88%] w-24 opacity-40" speed={-0.08}>
           <Branch className="-scale-x-100" />
         </Float>
       </div>
 
-      <Hero />
+      <Reveal>
+        <Hero />
+      </Reveal>
       <Divider />
-      <FocusAreas />
+      <Reveal>
+        <FocusAreas />
+      </Reveal>
       <Divider />
-      <Approach />
+      <Reveal>
+        <Approach />
+      </Reveal>
       <Divider />
-      <OnlineTherapy />
+      <Reveal>
+        <OnlineTherapy />
+      </Reveal>
       <Divider />
-      <ClosingCta />
+      <Reveal>
+        <ClosingCta />
+      </Reveal>
     </main>
   );
 }

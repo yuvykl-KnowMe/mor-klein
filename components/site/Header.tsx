@@ -13,8 +13,8 @@ export function Header() {
             src={logo}
             alt={SITE_NAME}
             priority
-            className="h-10 w-auto sm:h-12"
-            sizes="160px"
+            className="h-15 w-auto sm:h-18"
+            sizes="240px"
           />
         </Link>
         <CtaLink href={BOOKING_URL}>שיחת היכרות</CtaLink>

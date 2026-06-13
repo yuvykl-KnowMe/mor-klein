@@ -1,5 +1,5 @@
 import Image from "next/image";
-import portrait from "@/public/mor-portrait-new.png";
+import portrait from "@/public/mor-portrait.png";
 
 // Mor's portrait as the focal point, set inside the brand art:
 // gold organic blobs and a slate continuous-line accent frame the photo.

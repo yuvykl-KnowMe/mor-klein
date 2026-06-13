@@ -1,4 +1,5 @@
-import { CtaLink } from "@/components/ui/CtaLink";
+import { BookingButton } from "@/components/ui/BookingButton";
+import { PhoneCallout } from "@/components/ui/PhoneCallout";
 import { EMAIL } from "@/lib/site";
 
 export function ClosingCta() {
@@ -15,8 +16,8 @@ export function ClosingCta() {
           שיחת ההיכרות הראשונה היא ללא עלות וללא התחייבות, הזדמנות להכיר,
           לשאול, ולבדוק יחד אם זה מתאים לכם.
         </p>
-        {/* TODO: point at the Cal.com booking URL once scheduling is wired up */}
-        <CtaLink href={`mailto:${EMAIL}`}>כתבו לי לתיאום שיחת היכרות</CtaLink>
+        <BookingButton>לתיאום שיחת היכרות ללא עלות</BookingButton>
+        <PhoneCallout align="center" />
         <p className="text-ink-muted">
           או במייל:{" "}
           <a

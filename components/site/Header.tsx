@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
-import { CtaLink } from "@/components/ui/CtaLink";
-import { BOOKING_URL, SITE_NAME } from "@/lib/site";
+import { BookingButton } from "@/components/ui/BookingButton";
+import { SITE_NAME } from "@/lib/site";
 import logo from "@/public/mor-logo-horizontal.png";
 
 export function Header() {
@@ -17,7 +17,7 @@ export function Header() {
             sizes="240px"
           />
         </Link>
-        <CtaLink href={BOOKING_URL}>שיחת היכרות</CtaLink>
+        <BookingButton>שיחת היכרות</BookingButton>
       </div>
     </header>
   );

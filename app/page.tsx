@@ -8,6 +8,7 @@ import { Reveal } from "@/components/decor/Reveal";
 import { Branch, Dots, Leaf, Scribble, Swirl } from "@/components/decor/WabiSabi";
 import {
   EMAIL,
+  PHONE_TEL,
   SITE_NAME,
   SITE_URL,
   TITLE_CREDENTIAL,
@@ -24,6 +25,7 @@ const jsonLd = {
       name: `${SITE_NAME}, פסיכותרפיה`,
       url: SITE_URL,
       email: EMAIL,
+      telephone: PHONE_TEL,
       description:
         "פסיכותרפיה אדלריאנית בזום, ליווי בצמתים של קריירה, זוגיות והורות צעירה.",
       serviceType: [
@@ -50,6 +52,7 @@ const jsonLd = {
       worksFor: { "@id": `${SITE_URL}/#practice` },
       url: SITE_URL,
       email: EMAIL,
+      telephone: PHONE_TEL,
     },
   ],
 };

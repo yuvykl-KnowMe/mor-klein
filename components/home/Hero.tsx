@@ -1,6 +1,7 @@
 import { PortraitSlot } from "@/components/home/PortraitSlot";
+import { BookingButton } from "@/components/ui/BookingButton";
 import { CtaLink } from "@/components/ui/CtaLink";
-import { BOOKING_URL } from "@/lib/site";
+import { PhoneCallout } from "@/components/ui/PhoneCallout";
 
 export function Hero() {
   return (
@@ -36,11 +37,14 @@ export function Hero() {
             שהעומס והלחץ כבר נכנסים איתם הביתה. נעבוד יחד בשיחות בזום, בקצב
             שמתאים לחיים עמוסים.
           </p>
-          <div className="flex flex-wrap items-center gap-4">
-            <CtaLink href={BOOKING_URL}>לתיאום שיחת היכרות ללא עלות</CtaLink>
-            <CtaLink href="#approach" variant="ghost">
-              איך אני עובדת
-            </CtaLink>
+          <div className="flex flex-col gap-5">
+            <div className="flex flex-wrap items-center gap-4">
+              <BookingButton>לתיאום שיחת היכרות ללא עלות</BookingButton>
+              <CtaLink href="#approach" variant="ghost">
+                איך אני עובדת
+              </CtaLink>
+            </div>
+            <PhoneCallout />
           </div>
         </div>
         <PortraitSlot />

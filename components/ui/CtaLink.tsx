@@ -4,10 +4,11 @@ type CtaLinkProps = AnchorHTMLAttributes<HTMLAnchorElement> & {
   variant?: "primary" | "ghost";
 };
 
-const base =
+// Shared so non-anchor CTAs (e.g. the Cal.com popup button) match exactly.
+export const ctaBase =
   "inline-flex min-h-11 items-center justify-center rounded-full px-6 py-2 font-medium transition-colors duration-300 ease-out";
 
-const variants = {
+export const ctaVariants = {
   primary: "bg-accent-deep text-on-accent hover:bg-accent-deeper",
   ghost: "border border-line text-accent-deep hover:bg-surface",
 };
@@ -20,7 +21,7 @@ export function CtaLink({
 }: CtaLinkProps) {
   return (
     <a
-      className={`${base} ${variants[variant]}${className ? ` ${className}` : ""}`}
+      className={`${ctaBase} ${ctaVariants[variant]}${className ? ` ${className}` : ""}`}
       {...props}
     >
       {children}

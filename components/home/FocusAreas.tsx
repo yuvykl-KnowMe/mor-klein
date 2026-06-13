@@ -27,7 +27,7 @@ export function FocusAreas() {
           {AREAS.map((area) => (
             <li
               key={area.title}
-              className="rounded-2xl border border-line bg-surface p-6"
+              className="rounded-2xl border border-line bg-surface p-6 transition duration-500 ease-out hover:border-accent motion-safe:hover:-translate-y-1"
             >
               <h3 className="font-heading text-xl font-semibold">
                 {area.title}

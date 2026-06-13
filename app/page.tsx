@@ -3,8 +3,8 @@ import { ClosingCta } from "@/components/home/ClosingCta";
 import { FocusAreas } from "@/components/home/FocusAreas";
 import { Hero } from "@/components/home/Hero";
 import { OnlineTherapy } from "@/components/home/OnlineTherapy";
-import { Blob, Divider, LineArc } from "@/components/decor/Decor";
-import { Reveal } from "@/components/decor/Reveal";
+import { Blob, Divider, Float, LineArc } from "@/components/decor/Decor";
+import { Branch, Dots, Leaf, Scribble, Swirl } from "@/components/decor/WabiSabi";
 import {
   EMAIL,
   SITE_NAME,
@@ -61,18 +61,38 @@ export default function Home() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      {/* Woven background decoration, drifting gently on scroll */}
+      {/* Woven background decoration: soft gold blobs + delicate slate line
+          motifs, fading in and drifting gently on scroll */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10">
         <Blob variant="up" className="-end-16 top-[5%] h-72 w-72" />
         <Blob variant="down" className="-start-20 top-[28%] h-64 w-64" />
         <Blob variant="up" className="-end-24 top-[56%] h-80 w-80" />
         <Blob variant="down" className="-start-16 top-[80%] h-64 w-64" />
-        <Reveal aria-hidden className="absolute start-[5%] top-[22%] w-44 rotate-6">
-          <LineArc />
-        </Reveal>
-        <Reveal aria-hidden className="absolute end-[7%] top-[66%] w-40 -rotate-6">
-          <LineArc />
-        </Reveal>
+
+        <Float className="start-[3%] top-[7%] w-24 opacity-50" drift="drift-soft-down">
+          <Leaf className="-rotate-6" />
+        </Float>
+        <Float className="end-[4%] top-[11%] w-28 opacity-45" drift="drift-soft-up">
+          <Branch />
+        </Float>
+        <Float className="start-[13%] top-[19%] w-10 opacity-60">
+          <Dots />
+        </Float>
+        <Float className="start-[6%] top-[40%] w-44 opacity-40" drift="drift-soft-up">
+          <LineArc className="rotate-3" />
+        </Float>
+        <Float className="end-[5%] top-[45%] w-40 opacity-45" drift="drift-soft-down">
+          <Swirl />
+        </Float>
+        <Float className="end-[12%] top-[62%] w-9 opacity-55">
+          <Dots />
+        </Float>
+        <Float className="start-[5%] top-[72%] w-28 opacity-40" drift="drift-soft-up">
+          <Scribble className="rotate-6" />
+        </Float>
+        <Float className="end-[6%] top-[88%] w-24 opacity-40" drift="drift-soft-down">
+          <Branch className="-scale-x-100" />
+        </Float>
       </div>
 
       <Hero />

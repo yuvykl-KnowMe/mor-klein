@@ -5,7 +5,7 @@ type CtaLinkProps = AnchorHTMLAttributes<HTMLAnchorElement> & {
 };
 
 const base =
-  "inline-flex min-h-11 items-center justify-center rounded-full px-6 py-2 font-medium transition-colors";
+  "inline-flex min-h-11 items-center justify-center rounded-full px-6 py-2 font-medium transition-colors duration-300 ease-out";
 
 const variants = {
   primary: "bg-accent-deep text-on-accent hover:bg-accent-deeper",

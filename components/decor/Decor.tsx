@@ -1,4 +1,24 @@
+import type { ReactNode } from "react";
 import { Reveal } from "@/components/decor/Reveal";
+
+// Absolutely-positioned decorative item: outer element carries the parallax
+// drift, inner Reveal carries the fade-in. Keeping the two transforms on
+// separate elements avoids them clobbering each other.
+export function Float({
+  className = "",
+  drift = "",
+  children,
+}: {
+  className?: string;
+  drift?: string;
+  children: ReactNode;
+}) {
+  return (
+    <div aria-hidden="true" className={`absolute ${drift} ${className}`}>
+      <Reveal aria-hidden>{children}</Reveal>
+    </div>
+  );
+}
 
 // Soft warm-gold blob. `variant` controls the gentle scroll parallax
 // direction (drift-* classes are gated on prefers-reduced-motion in globals.css).

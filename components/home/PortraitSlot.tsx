@@ -1,5 +1,5 @@
 import Image from "next/image";
-import portrait from "@/public/mor-portrait.png";
+import portrait from "@/public/mor-portrait-final.jpeg";
 
 // Mor's portrait as the focal point, set inside the brand art:
 // gold organic blobs and a slate continuous-line accent frame the photo.
@@ -42,7 +42,7 @@ export function PortraitSlot() {
       <div className="relative aspect-[4/5] overflow-hidden rounded-[2.75rem] border border-line bg-surface">
         <Image
           src={portrait}
-          alt="מור קליין"
+          alt="מור קליין, פסיכותרפיסטית אדלריאנית"
           priority
           sizes="(max-width: 640px) 16rem, (max-width: 1024px) 18rem, 20rem"
           className="h-full w-full object-cover"

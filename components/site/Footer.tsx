@@ -1,6 +1,7 @@
 import Link from "next/link";
 import {
   EMAIL,
+  NAV_LINKS,
   SITE_NAME,
   TITLE_CREDENTIAL,
   TITLE_PROFESSION,
@@ -22,6 +23,16 @@ export function Footer() {
             {EMAIL}
           </a>
         </p>
+        <nav
+          aria-label="ניווט ראשי"
+          className="flex flex-wrap gap-x-5 gap-y-1 pt-2"
+        >
+          {NAV_LINKS.map((link) => (
+            <Link key={link.href} href={link.href} className={footerLinkClass}>
+              {link.label}
+            </Link>
+          ))}
+        </nav>
         <p className="flex flex-wrap gap-x-5">
           <Link href="/privacy" className={footerLinkClass}>
             מדיניות פרטיות

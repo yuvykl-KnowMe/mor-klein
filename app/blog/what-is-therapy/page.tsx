@@ -14,7 +14,7 @@ export const metadata: Metadata = {
     locale: "he_IL",
     siteName: SITE_NAME,
     url: postPath(post.slug),
-    title: post.title,
+    title: `${post.title} | ${SITE_NAME}`,
     description: post.description,
   },
 };
@@ -98,8 +98,8 @@ export default function Post() {
           <h2 className={sectionHeading}>מה קורה בפגישה הראשונה?</h2>
           <div className={proseBody}>
             <p>
-              אחת השאלות הנפוצות ביותר היא: &quot;מה אני אמור להגיד בפגישה
-              הראשונה?&quot; התשובה הפשוטה היא שאין דבר כזה &quot;אמור&quot;.
+              אחת השאלות הנפוצות ביותר היא: ״מה אני אמור להגיד בפגישה
+              הראשונה?״ התשובה הפשוטה היא שאין דבר כזה ״אמור״.
               הפגישה הראשונה היא הזדמנות להכיר.
             </p>
             <p>

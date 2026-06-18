@@ -1,11 +1,23 @@
 import type { Metadata } from "next";
+import { SITE_NAME } from "@/lib/site";
+
+const PAGE_TITLE = "שאלות נפוצות על טיפול";
+const PAGE_DESCRIPTION =
+  "תשובות לשאלות נפוצות על טיפול נפשי, הגישה האדלריאנית, טיפול בזום ועוד.";
 
 export const metadata: Metadata = {
   // Parent template appends " | מור קליין", yielding the spec title.
-  title: "שאלות נפוצות על טיפול",
-  description:
-    "תשובות לשאלות נפוצות על טיפול נפשי, הגישה האדלריאנית, טיפול בזום ועוד.",
+  title: PAGE_TITLE,
+  description: PAGE_DESCRIPTION,
   alternates: { canonical: "/faq" },
+  openGraph: {
+    type: "website",
+    locale: "he_IL",
+    siteName: SITE_NAME,
+    url: "/faq",
+    title: `${PAGE_TITLE} | ${SITE_NAME}`,
+    description: PAGE_DESCRIPTION,
+  },
 };
 
 // Single source for both the rendered accordion and the FAQ structured data.

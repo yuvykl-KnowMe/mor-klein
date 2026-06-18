@@ -14,7 +14,7 @@ export const metadata: Metadata = {
     locale: "he_IL",
     siteName: SITE_NAME,
     url: postPath(post.slug),
-    title: post.title,
+    title: `${post.title} | ${SITE_NAME}`,
     description: post.description,
   },
 };
@@ -58,9 +58,9 @@ export default function Post() {
 
         <div className={proseBody}>
           <p>
-            אחת השאלות שאני שומעת לא פעם היא: &quot;למה בטיפול תמיד חוזרים
-            לילדות?&quot; ולפעמים השאלה מגיעה עם חשש נוסף: &quot;אני לא רוצה
-            להאשים את ההורים שלי.&quot;
+            אחת השאלות שאני שומעת לא פעם היא: ״למה בטיפול תמיד חוזרים
+            לילדות?״ ולפעמים השאלה מגיעה עם חשש נוסף: ״אני לא רוצה
+            להאשים את ההורים שלי.״
           </p>
           <p>
             זו שאלה חשובה. ואולי דווקא בגלל זה כדאי להתחיל מהתשובה הפשוטה: המטרה

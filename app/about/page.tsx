@@ -4,15 +4,25 @@ import { Reveal } from "@/components/decor/Reveal";
 import { Branch, Dots, Leaf } from "@/components/decor/WabiSabi";
 import { PHONE_TEL, SITE_NAME, SITE_URL } from "@/lib/site";
 
+// Name-first title (bypasses the parent "%s | מור קליין" template) and
+// description, reused for the document head and Open Graph so they stay in sync.
+const PAGE_TITLE =
+  "מור קליין | עובדת סוציאלית קלינית (M.A.) ופסיכותרפיסטית אדלריאנית";
+const PAGE_DESCRIPTION =
+  "עובדת סוציאלית קלינית (M.A.) ופסיכותרפיסטית אדלריאנית. טיפול אישי בזום או פנים אל פנים בהרצליה. התמחות בקריירה, זוגיות והורות צעירה.";
+
 export const metadata: Metadata = {
-  // Name-first title the parent "%s | מור קליין" template can't produce, so
-  // bypass it with `absolute`.
-  title: {
-    absolute: "מור קליין | עובדת סוציאלית קלינית (M.A.) ופסיכותרפיסטית אדלריאנית",
-  },
-  description:
-    "עובדת סוציאלית קלינית (M.A.) ופסיכותרפיסטית אדלריאנית. טיפול אישי בזום או פנים אל פנים בהרצליה. התמחות בקריירה, זוגיות והורות צעירה.",
+  title: { absolute: PAGE_TITLE },
+  description: PAGE_DESCRIPTION,
   alternates: { canonical: "/about" },
+  openGraph: {
+    type: "website",
+    locale: "he_IL",
+    siteName: SITE_NAME,
+    url: "/about",
+    title: PAGE_TITLE,
+    description: PAGE_DESCRIPTION,
+  },
 };
 
 // Person structured data. URLs stay non-www to match SITE_URL / metadataBase
@@ -75,6 +85,12 @@ export default function About() {
                 וזוגיות, והמעבר להורות צעירה.
               </p>
               <p>
+                חלק גדול מהאנשים שאני פוגשת חיים בקצב תובעני, אנשי הייטק, מנהלות
+                ומנהלים ובעלי אחריות גדולה. העומס והלחץ מהעבודה לא תמיד נשארים
+                במשרד, הם נכנסים הביתה, אל הזוגיות, אל ההורות ואל היחס שלנו
+                לעצמנו.
+              </p>
+              <p>
                 חלק מהאנשים שמגיעים אליי יודעים בדיוק מה מטריד אותם, ואחרים פשוט
                 מרגישים שמשהו תקוע ולא לגמרי ברור. גם עבודה על זוגיות ומערכות
                 יחסים מתרחשת לעיתים קרובות בתוך טיפול אישי, מתוך הצד שלכם בקשר.
@@ -132,6 +148,10 @@ export default function About() {
                 בחולון, וכמטפלת פרטנית ביחידה לטיפול בהתמכרויות באגף הרווחה
                 בחולון. המפגש עם אנשים בנקודות שונות כל כך בחייהם לימד אותי עד כמה
                 כל סיפור הוא יחיד, ועד כמה הרצון לחיות אחרת משותף לכולנו.
+              </p>
+              <p>
+                ומעבר למקצוע, אני נשואה ואמא לשלוש בנות, והמעבר להורות, על השמחה
+                והטלטלה שבו, מוכר לי לא רק מחדר הטיפול אלא גם מהחיים עצמם.
               </p>
             </div>
           </Reveal>

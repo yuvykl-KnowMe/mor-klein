@@ -1,13 +1,24 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { POSTS, postPath } from "@/lib/blog";
+import { SITE_NAME } from "@/lib/site";
+
+const PAGE_TITLE = "מאמרים";
+const PAGE_DESCRIPTION =
+  "מאמרים קצרים על טיפול נפשי, הגישה האדלריאנית ודפוסים שחוזרים, מאת מור קליין, פסיכותרפיסטית אדלריאנית.";
 
 export const metadata: Metadata = {
-  // Parent template appends " | מור קליין".
-  title: "מאמרים",
-  description:
-    "מאמרים קצרים על טיפול נפשי, הגישה האדלריאנית ודפוסים שחוזרים, מאת מור קליין, פסיכותרפיסטית אדלריאנית.",
+  title: PAGE_TITLE,
+  description: PAGE_DESCRIPTION,
   alternates: { canonical: "/blog" },
+  openGraph: {
+    type: "website",
+    locale: "he_IL",
+    siteName: SITE_NAME,
+    url: "/blog",
+    title: `${PAGE_TITLE} | ${SITE_NAME}`,
+    description: PAGE_DESCRIPTION,
+  },
 };
 
 export default function BlogIndex() {

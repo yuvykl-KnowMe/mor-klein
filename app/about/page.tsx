@@ -25,15 +25,19 @@ export const metadata: Metadata = {
   },
 };
 
-// Person structured data. URLs stay non-www to match SITE_URL / metadataBase
-// and the home page graph (the apex 308-redirects to www in production).
+// Person structured data. Shares the same @id as the home page's Person node so
+// Google reads both as one entity, and links to the practice via @id (no
+// duplication). URLs stay non-www to match SITE_URL / metadataBase and the home
+// page graph (the apex 308-redirects to www in production).
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "Person",
+  "@id": `${SITE_URL}/#person`,
   name: SITE_NAME,
   jobTitle: "עובדת סוציאלית קלינית (M.A.) ופסיכותרפיסטית אדלריאנית",
   url: SITE_URL,
   telephone: PHONE_TEL,
+  worksFor: { "@id": `${SITE_URL}/#practice` },
 };
 
 export default function About() {

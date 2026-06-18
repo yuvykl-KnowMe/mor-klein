@@ -23,18 +23,40 @@ export const metadata: Metadata = {
 // Dates reflect creation; bump dateModified when the body content lands.
 const jsonLd = {
   "@context": "https://schema.org",
-  "@type": "Article",
-  headline: post.title,
-  description: post.description,
-  inLanguage: "he",
-  author: { "@type": "Person", name: SITE_NAME },
-  publisher: { "@type": "Organization", name: SITE_NAME, url: SITE_URL },
-  mainEntityOfPage: {
-    "@type": "WebPage",
-    "@id": `${SITE_URL}${postPath(post.slug)}`,
-  },
-  datePublished: "2026-06-18",
-  dateModified: "2026-06-18",
+  "@graph": [
+    {
+      "@type": "Article",
+      headline: post.title,
+      description: post.description,
+      inLanguage: "he",
+      author: { "@type": "Person", name: SITE_NAME },
+      publisher: { "@type": "Organization", name: SITE_NAME, url: SITE_URL },
+      mainEntityOfPage: {
+        "@type": "WebPage",
+        "@id": `${SITE_URL}${postPath(post.slug)}`,
+      },
+      datePublished: "2026-06-18",
+      dateModified: "2026-06-18",
+    },
+    {
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "בית", item: SITE_URL },
+        {
+          "@type": "ListItem",
+          position: 2,
+          name: "מאמרים",
+          item: `${SITE_URL}/blog`,
+        },
+        {
+          "@type": "ListItem",
+          position: 3,
+          name: post.title,
+          item: `${SITE_URL}${postPath(post.slug)}`,
+        },
+      ],
+    },
+  ],
 };
 
 // In-prose link pattern, matching /about and the home contact links.

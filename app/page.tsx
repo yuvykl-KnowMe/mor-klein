@@ -15,27 +15,46 @@ import {
   TITLE_PROFESSION,
 } from "@/lib/site";
 
-// Only true, confirmed facts. No address, phone, hours, prices or ratings.
+// Local-SEO / GEO anchor for the practice. City-level address only — no street
+// address, since the in-person clinic is a home (privacy). priceRange is a
+// generic band, not a real fee. The Adlerian-psychotherapy specialty is carried
+// by description + serviceType rather than schema.org's MedicalSpecialty enum,
+// which has no accurate value for psychotherapy.
 const jsonLd = {
   "@context": "https://schema.org",
   "@graph": [
     {
-      "@type": "ProfessionalService",
+      "@type": ["MedicalBusiness", "ProfessionalService"],
       "@id": `${SITE_URL}/#practice`,
       name: `${SITE_NAME}, פסיכותרפיה`,
       url: SITE_URL,
       email: EMAIL,
       telephone: PHONE_TEL,
+      priceRange: "₪₪",
       description:
-        "פסיכותרפיה אדלריאנית בזום, ליווי בצמתים של קריירה, זוגיות והורות צעירה.",
+        "פסיכותרפיה אדלריאנית — ליווי אישי בזום בכל הארץ ובקליניקה בהרצליה, בצמתים של קריירה, זוגיות והורות צעירה. שיחת היכרות ראשונה ללא עלות.",
       serviceType: [
-        "פסיכותרפיה",
+        "פסיכותרפיה אדלריאנית",
         "ליווי זוגי",
         "ליווי בהורות צעירה",
         "ליווי בהתלבטויות קריירה",
       ],
-      areaServed: { "@type": "Country", name: "IL" },
+      // Both the in-person clinic (Herzliya) and the online-nationwide Zoom offering.
+      areaServed: [
+        { "@type": "City", name: "הרצליה" },
+        { "@type": "Country", name: "ישראל" },
+      ],
+      address: {
+        "@type": "PostalAddress",
+        addressLocality: "הרצליה",
+        addressRegion: "מחוז תל אביב",
+        addressCountry: "IL",
+      },
+      knowsLanguage: "he",
       availableLanguage: "he",
+      // Placeholder — fill with directory profile URLs (Hebpsy, Google Business,
+      // etc.) once those exist.
+      sameAs: [],
       founder: { "@id": `${SITE_URL}/#person` },
     },
     {

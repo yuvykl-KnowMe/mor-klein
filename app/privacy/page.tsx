@@ -64,7 +64,7 @@ export default function PrivacyPage() {
         <ul className="list-disc space-y-1 ps-5">
           {processors.map((p) => (
             <li key={p.name}>
-              <span dir="ltr">{p.name}</span> — {p.role}
+              <span dir="ltr">{p.name}</span>- {p.role}
             </li>
           ))}
         </ul>

@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { POSTS, postPath } from "@/lib/blog";
+import { getPublishedPosts, postPath } from "@/lib/blog";
 import { SITE_NAME } from "@/lib/site";
+
+// Post list comes from the site_posts table (published only), newest first.
+export const revalidate = 300;
 
 const PAGE_TITLE = "מאמרים";
 const PAGE_DESCRIPTION =
@@ -21,7 +24,9 @@ export const metadata: Metadata = {
   },
 };
 
-export default function BlogIndex() {
+export default async function BlogIndex() {
+  const posts = await getPublishedPosts();
+
   return (
     <main id="main" className="flex-1">
       <section aria-labelledby="blog-heading">
@@ -33,7 +38,7 @@ export default function BlogIndex() {
             מאמרים
           </h1>
           <ul className="mt-10 grid gap-6 sm:grid-cols-2">
-            {POSTS.map((post) => (
+            {posts.map((post) => (
               <li key={post.slug}>
                 <Link
                   href={postPath(post.slug)}

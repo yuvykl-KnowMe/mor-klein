@@ -8,8 +8,10 @@ export async function login(formData: FormData) {
   const username = String(formData.get("username") ?? "")
     .trim()
     .toLowerCase();
-  const password = String(formData.get("password") ?? "");
-  const expected = process.env.ADMIN_PASSWORD;
+  // Trimmed on both sides: an invisible trailing space (easy to paste into
+  // Vercel or type on a phone) must not lock Mor out.
+  const password = String(formData.get("password") ?? "").trim();
+  const expected = process.env.ADMIN_PASSWORD?.trim();
 
   if (!expected || username !== "mor" || !safeEqual(password, expected)) {
     redirect("/admin/login?error=1");

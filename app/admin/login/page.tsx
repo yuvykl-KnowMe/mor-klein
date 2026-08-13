@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { login } from "./actions";
+import { PasswordInput } from "./PasswordInput";
 
 export const metadata: Metadata = {
   title: "כניסה לאזור הניהול",
@@ -41,14 +42,7 @@ export default async function AdminLoginPage({
         </label>
         <label className="flex flex-col gap-1 text-sm">
           <span>סיסמה</span>
-          <input
-            type="password"
-            name="password"
-            required
-            autoComplete="current-password"
-            dir="ltr"
-            className="min-h-11 rounded-xl border border-line bg-surface px-3 text-base"
-          />
+          <PasswordInput />
         </label>
         <button
           type="submit"

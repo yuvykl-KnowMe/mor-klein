@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { revalidatePath } from "next/cache";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
+import { createReceipt, PAYMENT_METHODS } from "@/lib/morning";
 import { supabaseAdmin } from "@/lib/supabase";
 import {
   formatDate,
@@ -22,12 +23,19 @@ export const metadata: Metadata = {
 const actionLinkClass =
   "rounded-lg bg-accent-deep px-4 py-2 text-on-accent hover:bg-accent-deeper";
 
+const inputClass = "mt-1 w-full rounded-lg border border-line bg-surface p-3";
+
+const DEFAULT_DESCRIPTION = "פגישת טיפול";
+
 export default async function SubmissionPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
   const { id } = await params;
+  const sp = await searchParams;
   const { data } = await supabaseAdmin
     .from("intake_submissions")
     .select("*")
@@ -50,6 +58,63 @@ export default async function SubmissionPage({
     await supabaseAdmin.from("intake_submissions").update(update).eq("id", id);
     revalidatePath("/admin");
     revalidatePath(`/admin/${id}`);
+  }
+
+  async function issueReceipt(formData: FormData) {
+    "use server";
+    const amountRaw = String(formData.get("amount") ?? "").trim();
+    const methodRaw = String(formData.get("payment_method") ?? "");
+    const description =
+      String(formData.get("description") ?? "").trim() || DEFAULT_DESCRIPTION;
+    const sendEmail = formData.get("send_email") === "on";
+
+    // On failure, round-trip the entered values via the URL so the form keeps them.
+    const back = (error: string) =>
+      redirect(
+        `/admin/${id}?` +
+          new URLSearchParams({
+            receipt_error: error,
+            amount: amountRaw,
+            method: methodRaw,
+            description,
+            ...(sendEmail ? {} : { no_email: "1" }),
+          }).toString(),
+      );
+
+    const amount = Math.round(Number(amountRaw) * 100) / 100;
+    if (!Number.isFinite(amount) || amount <= 0) {
+      return back("יש להזין סכום חוקי (מספר חיובי בשקלים).");
+    }
+    if (!(methodRaw in PAYMENT_METHODS)) {
+      return back("יש לבחור אמצעי תשלום.");
+    }
+
+    let receipt;
+    try {
+      receipt = await createReceipt({
+        name: s.full_name,
+        phone: s.phone,
+        email: sendEmail && s.email ? s.email : undefined,
+        amount,
+        paymentMethod: methodRaw as keyof typeof PAYMENT_METHODS,
+        description,
+      });
+    } catch (e) {
+      const detail = e instanceof Error ? e.message : "שגיאה לא ידועה";
+      return back(`הפקת הקבלה נכשלה: ${detail}`);
+    }
+
+    await supabaseAdmin
+      .from("intake_submissions")
+      .update({
+        receipt_id: receipt.id,
+        receipt_url: receipt.url,
+        receipt_amount: amount.toFixed(2),
+        receipt_created_at: new Date().toISOString(),
+      })
+      .eq("id", id);
+    revalidatePath(`/admin/${id}`);
+    redirect(`/admin/${id}?receipt_ok=1`);
   }
 
   const fields: [string, string | null][] = [
@@ -142,6 +207,112 @@ export default async function SubmissionPage({
           שמירת הערה
         </button>
       </form>
+
+      {/* Payment + receipt (Morning / Green Invoice) */}
+      <section className="mt-8 rounded-xl border border-line bg-surface p-4">
+        <h2 className="font-heading text-lg font-bold">תשלום והפקת קבלה</h2>
+
+        {s.receipt_id ? (
+          <p className="mt-2 text-sm text-ink-muted">
+            הקבלה האחרונה: ₪{s.receipt_amount}
+            {s.receipt_created_at ? ` · ${formatDate(s.receipt_created_at)}` : ""}
+            {s.receipt_url ? (
+              <>
+                {" · "}
+                <a
+                  href={s.receipt_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-accent-deep underline"
+                >
+                  צפייה בקבלה
+                </a>
+              </>
+            ) : null}
+            <br />
+            אפשר להפיק קבלה נוספת (למשל עבור פגישה נוספת).
+          </p>
+        ) : null}
+
+        {sp.receipt_ok === "1" ? (
+          <p className="mt-3 rounded-lg border border-line bg-sand p-3 text-sm">
+            הקבלה הופקה בהצלחה.
+          </p>
+        ) : null}
+        {typeof sp.receipt_error === "string" && sp.receipt_error ? (
+          <p className="mt-3 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+            {sp.receipt_error}
+          </p>
+        ) : null}
+
+        <form action={issueReceipt} className="mt-4 space-y-4">
+          <div>
+            <label htmlFor="amount" className="block text-sm text-ink-muted">
+              סכום בש&quot;ח
+            </label>
+            <input
+              id="amount"
+              name="amount"
+              type="number"
+              inputMode="decimal"
+              min="1"
+              step="0.01"
+              required
+              defaultValue={typeof sp.amount === "string" ? sp.amount : ""}
+              className={inputClass}
+            />
+          </div>
+          <div>
+            <label
+              htmlFor="payment_method"
+              className="block text-sm text-ink-muted"
+            >
+              אמצעי תשלום
+            </label>
+            <select
+              id="payment_method"
+              name="payment_method"
+              defaultValue={typeof sp.method === "string" ? sp.method : "bit"}
+              className={inputClass}
+            >
+              {Object.entries(PAYMENT_METHODS).map(([value, { label }]) => (
+                <option key={value} value={value}>
+                  {label}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label htmlFor="description" className="block text-sm text-ink-muted">
+              תיאור
+            </label>
+            <input
+              id="description"
+              name="description"
+              type="text"
+              defaultValue={
+                typeof sp.description === "string"
+                  ? sp.description
+                  : DEFAULT_DESCRIPTION
+              }
+              className={inputClass}
+            />
+          </div>
+          {s.email ? (
+            <label className="flex items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                name="send_email"
+                defaultChecked={sp.no_email !== "1"}
+              />
+              שליחת הקבלה ללקוח/ה במייל ({s.email})
+            </label>
+          ) : null}
+          <button type="submit" className={actionLinkClass}>
+            הפקת קבלה
+          </button>
+        </form>
+      </section>
     </main>
   );
 }

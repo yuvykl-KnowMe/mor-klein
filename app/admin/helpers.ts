@@ -16,6 +16,10 @@ export type Submission = {
   expectations: string | null;
   status: string;
   admin_note: string | null;
+  receipt_id: string | null;
+  receipt_url: string | null;
+  receipt_amount: string | null;
+  receipt_created_at: string | null;
 };
 
 const dateFormat = new Intl.DateTimeFormat("he-IL", {

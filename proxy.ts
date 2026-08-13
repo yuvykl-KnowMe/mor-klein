@@ -1,48 +1,45 @@
-import { timingSafeEqual } from "node:crypto";
 import { NextResponse, type NextRequest } from "next/server";
+import { SESSION_COOKIE, safeEqual, sessionToken } from "@/lib/adminSession";
 
-// HTTP Basic Auth for the admin area only (see `config.matcher` below).
-// Username is fixed ("mor"); password comes from ADMIN_PASSWORD. If the env
-// var is missing we fail closed: every request gets 401.
+// Cookie-session auth for the admin area only (see `config.matcher` below).
+// The login form at /admin/login checks ADMIN_PASSWORD and sets a signed
+// session cookie; here we only verify that cookie. If the env var is missing
+// we fail closed: every request gets 401.
 
 const NOINDEX = "noindex, nofollow";
 
-function unauthorized() {
-  return new NextResponse("Authentication required", {
-    status: 401,
-    headers: {
-      "WWW-Authenticate": 'Basic realm="Admin", charset="UTF-8"',
-      "X-Robots-Tag": NOINDEX,
-    },
-  });
-}
-
-function safeEqual(a: string, b: string) {
-  const bufA = Buffer.from(a);
-  const bufB = Buffer.from(b);
-  return bufA.length === bufB.length && timingSafeEqual(bufA, bufB);
+function withNoindex(response: NextResponse) {
+  response.headers.set("X-Robots-Tag", NOINDEX);
+  return response;
 }
 
 export function proxy(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+
+  // The login page itself must stay reachable.
+  if (pathname === "/admin/login") return withNoindex(NextResponse.next());
+
   const password = process.env.ADMIN_PASSWORD;
-  if (!password) return unauthorized();
-
-  const header = request.headers.get("authorization") ?? "";
-  if (!header.startsWith("Basic ")) return unauthorized();
-
-  const decoded = Buffer.from(header.slice(6), "base64").toString("utf8");
-  const sep = decoded.indexOf(":");
-  if (sep < 0) return unauthorized();
-
-  const user = decoded.slice(0, sep);
-  const pass = decoded.slice(sep + 1);
-  if (!safeEqual(user, "mor") || !safeEqual(pass, password)) {
-    return unauthorized();
+  if (!password) {
+    return new NextResponse("Admin area is not configured", {
+      status: 401,
+      headers: { "X-Robots-Tag": NOINDEX },
+    });
   }
 
-  const response = NextResponse.next();
-  response.headers.set("X-Robots-Tag", NOINDEX);
-  return response;
+  const cookie = request.cookies.get(SESSION_COOKIE)?.value ?? "";
+  if (cookie && safeEqual(cookie, sessionToken(password))) {
+    return withNoindex(NextResponse.next());
+  }
+
+  if (pathname.startsWith("/api/")) {
+    return withNoindex(
+      NextResponse.json({ error: "unauthorized" }, { status: 401 })
+    );
+  }
+  return withNoindex(
+    NextResponse.redirect(new URL("/admin/login", request.url))
+  );
 }
 
 export const config = {

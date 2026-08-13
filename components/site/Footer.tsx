@@ -40,6 +40,9 @@ export function Footer() {
           <Link href="/terms" className={footerLinkClass}>
             תנאי שימוש
           </Link>
+          <Link href="/admin" className={footerLinkClass}>
+            אדמין
+          </Link>
         </p>
         {/* TODO: add a link to the accessibility statement page once it ships (required by IS 5568) */}
         <p>© {new Date().getFullYear()} {SITE_NAME}. כל הזכויות שמורות.</p>

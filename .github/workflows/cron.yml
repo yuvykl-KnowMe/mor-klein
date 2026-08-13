@@ -1,0 +1,25 @@
+# Free scheduler for the site's cron endpoints (public repo -> free Actions).
+# Endpoints are idempotent and auth-free; see the route files for the
+# CRON_SECRET note if that ever changes.
+name: cron
+
+on:
+  schedule:
+    - cron: "0 * * * *" # hourly job
+    - cron: "*/5 * * * *" # frequent job
+  workflow_dispatch:
+
+jobs:
+  hourly:
+    if: github.event.schedule == '0 * * * *' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          curl -fsS https://www.mor-klein.co.il/api/cron/hourly
+          curl -fsS https://www.mor-klein.co.il/api/cron/generate-sessions
+
+  frequent:
+    if: github.event.schedule == '*/5 * * * *' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - run: curl -fsS https://www.mor-klein.co.il/api/cron/frequent

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { supabaseAdmin } from "@/lib/supabase";
+import { CopyLink } from "./CopyLink";
 import { formatDate, statusBadgeClass, statusLabel } from "./helpers";
 
 export const dynamic = "force-dynamic";
@@ -29,6 +30,8 @@ export default async function AdminPage() {
   return (
     <main id="main" className="mx-auto w-full max-w-2xl flex-1 px-4 py-10">
       <h1 className="font-heading text-2xl font-bold">פניות מהשאלון</h1>
+
+      <CopyLink url="https://mor-klein.co.il/intake" />
 
       {error ? (
         <p className="mt-6 rounded-xl border border-line bg-surface p-5 text-ink-muted">

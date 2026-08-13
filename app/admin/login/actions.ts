@@ -13,7 +13,9 @@ export async function login(formData: FormData) {
   const password = String(formData.get("password") ?? "").trim();
   const expected = process.env.ADMIN_PASSWORD?.trim();
 
-  if (!expected || username !== "mor" || !safeEqual(password, expected)) {
+  // Password managers autofill the email as the username — accept both.
+  const validUser = username === "mor" || username === "mor@mor-klein.co.il";
+  if (!expected || !validUser || !safeEqual(password, expected)) {
     redirect("/admin/login?error=1");
   }
 

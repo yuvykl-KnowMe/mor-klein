@@ -42,7 +42,10 @@ type Row = {
   id: string;
   scheduled_at: string;
   duration_min: number;
-  patients: { name: string } | { name: string }[] | null;
+  patients:
+    | { name: string; phone: string | null }
+    | { name: string; phone: string | null }[]
+    | null;
 };
 
 export async function GET(request: Request) {
@@ -59,7 +62,7 @@ export async function GET(request: Request) {
 
   const { data, error } = await supabaseAdmin
     .from("sessions")
-    .select("id, scheduled_at, duration_min, patients(name)")
+    .select("id, scheduled_at, duration_min, patients(name, phone)")
     .neq("status", "canceled")
     .gte("scheduled_at", from.toISOString())
     .lt("scheduled_at", to.toISOString())
@@ -67,6 +70,7 @@ export async function GET(request: Request) {
   if (error) return new Response("Server error", { status: 500 });
 
   const stamp = icsDate(new Date());
+  const zoomUrl = process.env.MOR_ZOOM_URL;
   const lines: string[] = [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
@@ -79,6 +83,13 @@ export async function GET(request: Request) {
     const p = Array.isArray(row.patients) ? row.patients[0] : row.patients;
     const start = new Date(row.scheduled_at);
     const end = new Date(start.getTime() + (row.duration_min || 50) * 60000);
+    // Zoom link + patient phone travel in the event itself, so the calendar
+    // reminder on Mor's phone already carries everything she needs to start
+    // the session or forward the link.
+    const details = [
+      zoomUrl ? `קישור לפגישה: ${zoomUrl}` : null,
+      p?.phone ? `טלפון: ${p.phone}` : null,
+    ].filter(Boolean);
     lines.push(
       "BEGIN:VEVENT",
       fold(`UID:${row.id}`),
@@ -86,6 +97,10 @@ export async function GET(request: Request) {
       `DTSTART:${icsDate(start)}`,
       `DTEND:${icsDate(end)}`,
       fold(`SUMMARY:${icsEscape(`פגישה: ${p?.name ?? "מטופל/ת"}`)}`),
+      ...(details.length
+        ? [fold(`DESCRIPTION:${icsEscape(details.join("\n"))}`)]
+        : []),
+      ...(zoomUrl ? [fold(`LOCATION:${icsEscape(zoomUrl)}`)] : []),
       "END:VEVENT",
     );
   }

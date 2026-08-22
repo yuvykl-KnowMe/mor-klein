@@ -47,10 +47,19 @@ type SessionRow = {
   zoom_link_sent_at: string | null;
   payment_email_sent_at: string | null;
   patients:
-    | { name: string; email: string | null }
-    | { name: string; email: string | null }[]
+    | { name: string; email: string | null; phone: string | null }
+    | { name: string; email: string | null; phone: string | null }[]
     | null;
 };
+
+/** Israeli local number -> wa.me international form. Null if unusable. */
+function waNumber(phone: string | null | undefined): string | null {
+  if (!phone) return null;
+  const digits = phone.replace(/\D/g, "");
+  if (digits.startsWith("972")) return digits;
+  if (digits.startsWith("0")) return "972" + digits.slice(1);
+  return digits.length >= 9 ? digits : null;
+}
 
 const timeFormat = new Intl.DateTimeFormat("he-IL", {
   hour: "2-digit",
@@ -241,7 +250,7 @@ export default async function WeekPage({
     supabaseAdmin
       .from("sessions")
       .select(
-        "id, scheduled_at, duration_min, status, price, patient_id, paid_at, reminder_sent_at, zoom_link_sent_at, payment_email_sent_at, patients(name, email)",
+        "id, scheduled_at, duration_min, status, price, patient_id, paid_at, reminder_sent_at, zoom_link_sent_at, payment_email_sent_at, patients(name, email, phone)",
       )
       .gte("scheduled_at", weekStart.toISOString())
       .lt("scheduled_at", weekEnd.toISOString())
@@ -261,6 +270,7 @@ export default async function WeekPage({
     if (idx >= 0 && idx < 7) byDay[idx].push(row);
   }
 
+  const zoomUrl = process.env.MOR_ZOOM_URL;
   const saturday = addDays(sunday, 6);
   const feedUrl = process.env.ADMIN_PASSWORD
     ? `https://www.mor-klein.co.il/api/calendar/feed?key=${sessionToken(
@@ -436,6 +446,22 @@ export default async function WeekPage({
                               לשלוח מיילים.
                             </span>
                           )}
+                          {/* Opens WhatsApp with the message ready; Mor sends
+                              it herself, so no WhatsApp Business API needed. */}
+                          {waNumber(patientOf(s)?.phone) && zoomUrl ? (
+                            <a
+                              href={`https://wa.me/${waNumber(patientOf(s)?.phone)}?text=${encodeURIComponent(
+                                `היי ${patientName(s)}, מזכירה שנפגשים היום ב-${timeFormat.format(
+                                  new Date(s.scheduled_at),
+                                )}. הקישור לפגישה: ${zoomUrl}`,
+                              )}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className={quietButtonClass}
+                            >
+                              קישור זום בוואטסאפ
+                            </a>
+                          ) : null}
                         </div>
                       ) : null}
                       {s.status === "done" &&

@@ -2,6 +2,8 @@
 // Schema verified against the official OpenAPI spec served at
 // https://developers.morning.co (docs/openapi.bundled.json, v2.0.0).
 
+import { EMAIL as MOR_EMAIL } from "@/lib/site";
+
 const BASE_URL = "https://api.greeninvoice.co.il/api/v1";
 
 const RECEIPT_TYPE = 400; // קבלה
@@ -48,6 +50,8 @@ export type ReceiptInput = {
   paymentMethod: PaymentMethod;
   description: string;
   remarks?: string;
+  /** YYYY-MM-DD the payment was actually received; defaults to today (Israel). */
+  date?: string;
 };
 
 export type Receipt = { id: string; number: number; url: string };
@@ -55,10 +59,13 @@ export type Receipt = { id: string; number: number; url: string };
 /** Creates a real receipt (type 400) in Mor's Morning bookkeeping. */
 export async function createReceipt(input: ReceiptInput): Promise<Receipt> {
   const method = PAYMENT_METHODS[input.paymentMethod];
-  // Today in Asia/Jerusalem, formatted YYYY-MM-DD (en-CA gives ISO order).
-  const date = new Intl.DateTimeFormat("en-CA", {
-    timeZone: "Asia/Jerusalem",
-  }).format(new Date());
+  // Receipt date = when the money was received. Falls back to today in
+  // Asia/Jerusalem, formatted YYYY-MM-DD (en-CA gives ISO order).
+  const date =
+    input.date ??
+    new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Jerusalem" }).format(
+      new Date(),
+    );
 
   const body = {
     type: RECEIPT_TYPE,
@@ -71,7 +78,8 @@ export async function createReceipt(input: ReceiptInput): Promise<Receipt> {
     attachment: true, // attach the PDF when Morning emails the receipt
     client: {
       name: input.name,
-      ...(input.email ? { emails: [input.email] } : {}),
+      // Mor always gets her own copy of every receipt, alongside the patient.
+      emails: input.email ? [input.email, MOR_EMAIL] : [MOR_EMAIL],
       ...(input.phone ? { phone: input.phone } : {}),
       add: false, // one-off client details; keep Morning's client list clean
     },

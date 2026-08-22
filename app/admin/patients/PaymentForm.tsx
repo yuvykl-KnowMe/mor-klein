@@ -123,6 +123,23 @@ export default function PaymentForm({
       </div>
 
       <div>
+        <label htmlFor="pay_date" className="block text-sm text-ink-muted">
+          תאריך קבלת התשלום — יופיע על הקבלה
+        </label>
+        <input
+          id="pay_date"
+          name="paid_date"
+          type="date"
+          dir="ltr"
+          required
+          defaultValue={new Intl.DateTimeFormat("en-CA", {
+            timeZone: "Asia/Jerusalem",
+          }).format(new Date())}
+          className={inputClass}
+        />
+      </div>
+
+      <div>
         <label htmlFor="pay_method" className="block text-sm text-ink-muted">
           אמצעי תשלום
         </label>
@@ -149,6 +166,15 @@ export default function PaymentForm({
         type="submit"
         className={buttonClass}
         disabled={picked.length === 0}
+        onClick={(e) => {
+          if (
+            !window.confirm(
+              `להפיק קבלה אמיתית על ${ils.format(Number(amount) || 0)} עבור ${picked.length} פגישות? אי אפשר לבטל קבלה מכאן.`,
+            )
+          ) {
+            e.preventDefault();
+          }
+        }}
       >
         סימון שולם והפקת קבלה
       </button>

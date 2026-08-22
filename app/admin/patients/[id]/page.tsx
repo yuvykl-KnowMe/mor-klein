@@ -5,6 +5,7 @@ import { notFound, redirect } from "next/navigation";
 import { createReceipt, PAYMENT_METHODS } from "@/lib/morning";
 import PaymentForm from "../PaymentForm";
 import { sendPaymentRequest } from "@/lib/notify";
+import { zonedToUtc } from "@/lib/sessions";
 import { supabaseAdmin } from "@/lib/supabase";
 import ConfirmButton from "../../ConfirmButton";
 import { formatDate } from "../../helpers";
@@ -46,7 +47,7 @@ export default async function PatientPage({
       .from("sessions")
       .select("*")
       .eq("patient_id", id)
-      .order("scheduled_at", { ascending: false }),
+      .order("scheduled_at", { ascending: true }),
   ]);
   if (!patientData) notFound();
 
@@ -204,6 +205,13 @@ export default async function PatientPage({
       return back("יש להזין את הסכום שהתקבל בפועל.");
     }
 
+    // The receipt is dated when the money was received, not when Mor got
+    // around to recording it.
+    const paidDate = String(formData.get("paid_date") ?? "");
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(paidDate)) {
+      return back("יש לבחור את תאריך קבלת התשלום.");
+    }
+
     const picked = formData.getAll("session_ids").map(String).filter(Boolean);
     if (picked.length === 0) {
       return back("יש לבחור לפחות פגישה אחת שהתשלום סוגר.");
@@ -239,16 +247,20 @@ export default async function PatientPage({
         remarks: `פגישות בתאריכים: ${rows
           .map((s) => formatDateOnly(s.scheduled_at))
           .join(", ")}`,
+        date: paidDate,
       });
     } catch (e) {
       const detail = e instanceof Error ? e.message : "שגיאה לא ידועה";
       return back(`הפקת הקבלה נכשלה: ${detail}`);
     }
 
+    const [py, pm, pd] = paidDate.split("-").map(Number);
     const { error: updateError } = await supabaseAdmin
       .from("sessions")
       .update({
-        paid_at: new Date().toISOString(),
+        // Anchor paid_at to the chosen payment date (noon Israel time), so
+        // the record matches the receipt rather than the data-entry moment.
+        paid_at: zonedToUtc(py, pm, pd, 12, 0).toISOString(),
         receipt_id: receipt.id,
         receipt_url: receipt.url,
       })
@@ -266,9 +278,11 @@ export default async function PatientPage({
     redirect(`/admin/patients/${id}?receipt_ok=1`);
   }
 
+  // Shown only while the weekly slot actually generates sessions — a
+  // configured-but-inactive slot on the info line just confused.
   const weeklySlot =
-    p.weekly_day !== null && p.weekly_time
-      ? `יום ${DAY_NAMES[p.weekly_day]} ${p.weekly_time}${p.weekly_active ? "" : " (לא פעיל)"}`
+    p.weekly_day !== null && p.weekly_time && p.weekly_active
+      ? `פגישה קבועה: יום ${DAY_NAMES[p.weekly_day]} ${p.weekly_time}`
       : null;
 
   const infoLine = [
@@ -414,13 +428,11 @@ export default async function PatientPage({
           </p>
           <PaymentForm
             action={markPaid}
-            sessions={[...unpaid]
-              .reverse()
-              .map((s) => ({
-                id: s.id,
-                date: formatDateOnly(s.scheduled_at),
-                price: Number(s.price),
-              }))}
+            sessions={unpaid.map((s) => ({
+              id: s.id,
+              date: formatDateOnly(s.scheduled_at),
+              price: Number(s.price),
+            }))}
           />
         </section>
       ) : null}
@@ -448,20 +460,19 @@ export default async function PatientPage({
                   </span>
                   {s.status === "done" ? (
                     s.paid_at ? (
-                      <span className="text-sm text-ink-muted">
-                        שולם
+                      <span className="inline-flex items-center gap-2">
+                        <span className="inline-block rounded-full border border-green-200 bg-green-50 px-3 py-0.5 text-sm font-semibold text-green-700">
+                          שולם ✓
+                        </span>
                         {s.receipt_url ? (
-                          <>
-                            {" · "}
-                            <a
-                              href={s.receipt_url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-accent-deep underline"
-                            >
-                              קבלה
-                            </a>
-                          </>
+                          <a
+                            href={s.receipt_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-sm text-accent-deep underline"
+                          >
+                            קבלה
+                          </a>
                         ) : null}
                       </span>
                     ) : (

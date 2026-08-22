@@ -20,6 +20,7 @@ import {
   type Ymd,
 } from "@/lib/sessions";
 import { supabaseAdmin } from "@/lib/supabase";
+import ConfirmButton from "../ConfirmButton";
 import { CopyButton, NewSessionForm, type PatientOption } from "./ui";
 
 export const dynamic = "force-dynamic";
@@ -406,12 +407,12 @@ export default async function WeekPage({
                                   name="w"
                                   value={ymdString(sunday)}
                                 />
-                                <button
-                                  type="submit"
+                                <ConfirmButton
+                                  message={`לשלוח תזכורת במייל אל ${patientName(s)}?`}
                                   className={quietButtonClass}
                                 >
                                   תזכורת במייל{s.reminder_sent_at ? " ✓" : ""}
-                                </button>
+                                </ConfirmButton>
                               </form>
                               <form action={emailZoom}>
                                 <input type="hidden" name="id" value={s.id} />
@@ -420,13 +421,13 @@ export default async function WeekPage({
                                   name="w"
                                   value={ymdString(sunday)}
                                 />
-                                <button
-                                  type="submit"
+                                <ConfirmButton
+                                  message={`לשלוח את קישור הזום במייל אל ${patientName(s)}?`}
                                   className={quietButtonClass}
                                 >
                                   קישור זום במייל
                                   {s.zoom_link_sent_at ? " ✓" : ""}
-                                </button>
+                                </ConfirmButton>
                               </form>
                             </>
                           ) : null}
@@ -446,10 +447,13 @@ export default async function WeekPage({
                             name="w"
                             value={ymdString(sunday)}
                           />
-                          <button type="submit" className={quietButtonClass}>
+                          <ConfirmButton
+                            message={`לשלוח בקשת תשלום במייל אל ${patientName(s)} על כל היתרה?`}
+                            className={quietButtonClass}
+                          >
                             בקשת תשלום במייל
                             {s.payment_email_sent_at ? " ✓" : ""}
-                          </button>
+                          </ConfirmButton>
                         </form>
                       ) : null}
                     </li>

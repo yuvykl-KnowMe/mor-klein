@@ -5,6 +5,7 @@ import { notFound, redirect } from "next/navigation";
 import { createReceipt, PAYMENT_METHODS } from "@/lib/morning";
 import { sendPaymentRequest } from "@/lib/notify";
 import { supabaseAdmin } from "@/lib/supabase";
+import ConfirmButton from "../../ConfirmButton";
 import { formatDate } from "../../helpers";
 import PatientForm from "../PatientForm";
 import {
@@ -340,9 +341,12 @@ export default async function PatientPage({
             (אפשר לכבות במרדף תשלום).
           </p>
           <form action={requestPayment} className="mt-3">
-            <button type="submit" className={buttonClass}>
+            <ConfirmButton
+              message={`לשלוח בקשת תשלום במייל אל ${p.name} על ${formatILS(owedTotal)}?`}
+              className={buttonClass}
+            >
               שליחת בקשת תשלום במייל
-            </button>
+            </ConfirmButton>
           </form>
         </section>
       ) : null}

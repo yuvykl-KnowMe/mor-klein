@@ -430,7 +430,12 @@ export default async function WeekPage({
                                 </ConfirmButton>
                               </form>
                             </>
-                          ) : null}
+                          ) : (
+                            <span className="text-sm text-ink-muted">
+                              אין כתובת מייל — מוסיפים בתיק המטופל/ת כדי
+                              לשלוח מיילים.
+                            </span>
+                          )}
                         </div>
                       ) : null}
                       {s.status === "done" &&

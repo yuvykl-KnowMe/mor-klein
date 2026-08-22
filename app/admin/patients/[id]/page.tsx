@@ -350,6 +350,12 @@ export default async function PatientPage({
           </form>
         </section>
       ) : null}
+      {unpaid.length > 0 && !p.email ? (
+        <p className="mt-6 rounded-xl border border-line bg-surface p-4 text-sm text-ink-muted">
+          יש יתרה לתשלום אבל אין כתובת מייל — מוסיפים מייל בעריכת הפרטים כדי
+          לשלוח בקשת תשלום.
+        </p>
+      ) : null}
 
       {/* Mark paid + receipt */}
       {unpaid.length > 0 ? (

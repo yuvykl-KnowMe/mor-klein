@@ -20,13 +20,20 @@ const whenFormat = new Intl.DateTimeFormat("he-IL", {
 });
 
 function failure(result: Exclude<SendResult, { ok: true }>): SendOutcome {
-  return {
-    sent: false,
-    reason:
-      "skipped" in result
-        ? "שליחת מיילים לא מוגדרת בשרת (חסר RESEND_API_KEY)"
-        : `השליחה נכשלה: ${result.error}`,
-  };
+  if ("skipped" in result) {
+    return {
+      sent: false,
+      reason: "שליחת מיילים לא מוגדרת בשרת (חסר RESEND_API_KEY)",
+    };
+  }
+  if (result.error.includes("domain is not verified")) {
+    return {
+      sent: false,
+      reason:
+        "הדומיין mor-klein.co.il עדיין לא מאומת ב-Resend — נדרש אימות חד-פעמי (רשומות DNS) לפני שאפשר לשלוח מיילים.",
+    };
+  }
+  return { sent: false, reason: `השליחה נכשלה: ${result.error}` };
 }
 
 type PatientRef = {

@@ -3,6 +3,7 @@ import { revalidatePath } from "next/cache";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { createReceipt, PAYMENT_METHODS } from "@/lib/morning";
+import PaymentForm from "../PaymentForm";
 import { sendPaymentRequest } from "@/lib/notify";
 import { supabaseAdmin } from "@/lib/supabase";
 import ConfirmButton from "../../ConfirmButton";
@@ -195,23 +196,34 @@ export default async function PatientPage({
       return back("יש לבחור אמצעי תשלום.");
     }
 
-    // Re-collect at action time — the page may be stale.
+    // The receipt is for the money actually received, which need not equal
+    // the sum of the sessions it settles (part payments, rounding, a bit
+    // extra toward the next session).
+    const amount = Math.round(Number(formData.get("amount")) * 100) / 100;
+    if (!Number.isFinite(amount) || amount <= 0) {
+      return back("יש להזין את הסכום שהתקבל בפועל.");
+    }
+
+    const picked = formData.getAll("session_ids").map(String).filter(Boolean);
+    if (picked.length === 0) {
+      return back("יש לבחור לפחות פגישה אחת שהתשלום סוגר.");
+    }
+
+    // Re-check at action time — the page may be stale, and only sessions that
+    // are still done-and-unpaid may be settled.
     const { data } = await supabaseAdmin
       .from("sessions")
       .select("id, price, scheduled_at")
       .eq("patient_id", id)
       .eq("status", "done")
       .is("paid_at", null)
+      .in("id", picked)
       .order("scheduled_at", { ascending: true });
     const rows = data ?? [];
     if (rows.length === 0) return back("אין פגישות שממתינות לתשלום.");
-
-    const total =
-      Math.round(rows.reduce((t, s) => t + Number(s.price), 0) * 100) / 100;
-    if (total <= 0) return back("סכום הפגישות שממתינות לתשלום הוא אפס.");
-    if (String(formData.get("expected_total")) !== total.toFixed(2)) {
+    if (rows.length !== picked.length) {
       return back(
-        "רשימת הפגישות השתנתה מאז שהדף נטען — כדאי לבדוק שוב ולאשר מחדש.",
+        "חלק מהפגישות שנבחרו כבר אינן ממתינות לתשלום — כדאי לרענן ולנסות שוב.",
       );
     }
 
@@ -221,7 +233,7 @@ export default async function PatientPage({
         name: p.name,
         email: p.email ?? undefined,
         phone: p.phone ?? undefined,
-        amount: total,
+        amount,
         paymentMethod: methodRaw as keyof typeof PAYMENT_METHODS,
         description: "טיפול פסיכותרפיה",
         remarks: `פגישות בתאריכים: ${rows
@@ -396,48 +408,20 @@ export default async function PatientPage({
             סימון שולם והפקת קבלה
           </h2>
           <p className="mt-2 text-sm text-ink-muted">
-            תופק קבלה אחת על סך {formatILS(owedTotal)} עבור {unpaid.length}{" "}
-            פגישות:{" "}
-            {[...unpaid]
-              .reverse()
-              .map((s) => formatDateOnly(s.scheduled_at))
-              .join(", ")}
-            {p.email ? ` · הקבלה תישלח במייל אל ${p.email}` : ""}
+            תופק קבלה אחת ב-Morning על הסכום שיוזן למטה
+            {p.email ? `, ותישלח במייל אל ${p.email}` : ""}. הפגישות שייבחרו
+            יסומנו כשולמו; פגישות שלא נבחרו יישארו פתוחות לתשלום הבא.
           </p>
-          <form action={markPaid} className="mt-4 space-y-4">
-            <input
-              type="hidden"
-              name="expected_total"
-              value={owedTotal.toFixed(2)}
-            />
-            <div>
-              <label
-                htmlFor="pay_method"
-                className="block text-sm text-ink-muted"
-              >
-                אמצעי תשלום
-              </label>
-              <select
-                id="pay_method"
-                name="payment_method"
-                defaultValue="bit"
-                className={inputClass}
-              >
-                {Object.entries(PAYMENT_METHODS).map(([value, { label }]) => (
-                  <option key={value} value={value}>
-                    {label}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <label className="flex items-center gap-2 text-sm">
-              <input type="checkbox" name="confirm" required />
-              אני מאשרת הפקת קבלה אמיתית בהנהלת החשבונות שלי
-            </label>
-            <button type="submit" className={buttonClass}>
-              סימון שולם
-            </button>
-          </form>
+          <PaymentForm
+            action={markPaid}
+            sessions={[...unpaid]
+              .reverse()
+              .map((s) => ({
+                id: s.id,
+                date: formatDateOnly(s.scheduled_at),
+                price: Number(s.price),
+              }))}
+          />
         </section>
       ) : null}
 

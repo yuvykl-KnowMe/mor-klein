@@ -102,6 +102,23 @@ export default async function PatientPage({
     revalidatePath(`/admin/patients/${id}`);
   }
 
+  // Records an out-of-band payment (receipt was already issued elsewhere):
+  // sets paid_at only, never calls Morning. For backfilled history.
+  async function markPaidNoReceipt(formData: FormData) {
+    "use server";
+    const sessionId = String(formData.get("session_id") ?? "");
+    if (!sessionId) return;
+    await supabaseAdmin
+      .from("sessions")
+      .update({ paid_at: new Date().toISOString() })
+      .eq("id", sessionId)
+      .eq("patient_id", id)
+      .eq("status", "done")
+      .is("paid_at", null);
+    revalidatePath("/admin/patients");
+    revalidatePath(`/admin/patients/${id}`);
+  }
+
   async function requestPayment() {
     "use server";
     const outcome = await sendPaymentRequest(id);
@@ -439,6 +456,17 @@ export default async function PatientPage({
                       <input type="hidden" name="session_id" value={s.id} />
                       <button type="submit" className={buttonClass}>
                         סיום פגישה
+                      </button>
+                    </form>
+                  ) : null}
+                  {s.status === "done" && !s.paid_at ? (
+                    <form action={markPaidNoReceipt}>
+                      <input type="hidden" name="session_id" value={s.id} />
+                      <button
+                        type="submit"
+                        className="rounded-lg border border-line bg-surface px-3 py-1.5 text-sm hover:bg-sand"
+                      >
+                        שולם בעבר (בלי קבלה)
                       </button>
                     </form>
                   ) : null}

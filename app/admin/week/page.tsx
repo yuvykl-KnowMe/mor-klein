@@ -1,8 +1,14 @@
 import type { Metadata } from "next";
 import { revalidatePath } from "next/cache";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { sessionToken } from "@/lib/adminSession";
-import { onSessionDone } from "@/lib/notify";
+import {
+  sendPaymentRequest,
+  sendSessionReminder,
+  sendZoomLink,
+  type SendOutcome,
+} from "@/lib/notify";
 import {
   addDays,
   dayOfWeek,
@@ -35,7 +41,14 @@ type SessionRow = {
   status: string;
   price: number;
   patient_id: string;
-  patients: { name: string } | { name: string }[] | null;
+  paid_at: string | null;
+  reminder_sent_at: string | null;
+  zoom_link_sent_at: string | null;
+  payment_email_sent_at: string | null;
+  patients:
+    | { name: string; email: string | null }
+    | { name: string; email: string | null }[]
+    | null;
 };
 
 const timeFormat = new Intl.DateTimeFormat("he-IL", {
@@ -72,9 +85,12 @@ function calDate(d: Ymd): Date {
   return new Date(Date.UTC(d.y, d.m - 1, d.d));
 }
 
+function patientOf(row: SessionRow) {
+  return Array.isArray(row.patients) ? row.patients[0] : row.patients;
+}
+
 function patientName(row: SessionRow): string {
-  const p = Array.isArray(row.patients) ? row.patients[0] : row.patients;
-  return p?.name ?? "מטופל/ת";
+  return patientOf(row)?.name ?? "מטופל/ת";
 }
 
 function statusBadge(status: string) {
@@ -106,22 +122,51 @@ function parseLocalInput(value: string): Date | null {
   return zonedToUtc(+m[1], +m[2], +m[3], +m[4], +m[5]);
 }
 
+// "בוצעה" only records the fact — it never emails anyone. Payment requests
+// go out via the explicit button below (emailPaymentRequest).
 async function markDone(formData: FormData) {
   "use server";
   const id = String(formData.get("id") ?? "");
   if (!id) return;
-  const { error } = await supabaseAdmin
+  await supabaseAdmin
     .from("sessions")
     .update({ status: "done", done_at: new Date().toISOString() })
     .eq("id", id);
-  if (!error) {
-    try {
-      await onSessionDone(id);
-    } catch {
-      // Notification failure must never fail the action.
-    }
-  }
   revalidatePath("/admin/week");
+}
+
+/** Redirect back to the week view with a mail_ok/mail_error banner. */
+function mailRedirect(week: string, outcome: SendOutcome): never {
+  const base = week ? `/admin/week?w=${week}&` : "/admin/week?";
+  redirect(
+    outcome.sent
+      ? `${base}mail_ok=1`
+      : `${base}mail_error=${encodeURIComponent(outcome.reason)}`,
+  );
+}
+
+async function emailReminder(formData: FormData) {
+  "use server";
+  const id = String(formData.get("id") ?? "");
+  const week = String(formData.get("w") ?? "");
+  if (!id) return;
+  mailRedirect(week, await sendSessionReminder(id));
+}
+
+async function emailZoom(formData: FormData) {
+  "use server";
+  const id = String(formData.get("id") ?? "");
+  const week = String(formData.get("w") ?? "");
+  if (!id) return;
+  mailRedirect(week, await sendZoomLink(id));
+}
+
+async function emailPaymentRequest(formData: FormData) {
+  "use server";
+  const patientId = String(formData.get("patient_id") ?? "");
+  const week = String(formData.get("w") ?? "");
+  if (!patientId) return;
+  mailRedirect(week, await sendPaymentRequest(patientId));
 }
 
 async function markCanceled(formData: FormData) {
@@ -138,11 +183,18 @@ async function markCanceled(formData: FormData) {
 async function reschedule(formData: FormData) {
   "use server";
   const id = String(formData.get("id") ?? "");
-  const at = parseLocalInput(String(formData.get("scheduled_at") ?? ""));
+  const date = String(formData.get("scheduled_date") ?? "");
+  const time = String(formData.get("scheduled_time") ?? "");
+  const at = parseLocalInput(`${date}T${time}`);
   if (!id || !at) return;
   await supabaseAdmin
     .from("sessions")
-    .update({ scheduled_at: at.toISOString() })
+    .update({
+      scheduled_at: at.toISOString(),
+      // New time — let the crons re-send the reminder and Zoom link.
+      reminder_sent_at: null,
+      zoom_link_sent_at: null,
+    })
     .eq("id", id);
   revalidatePath("/admin/week");
 }
@@ -150,7 +202,9 @@ async function reschedule(formData: FormData) {
 async function createSession(formData: FormData) {
   "use server";
   const patientId = String(formData.get("patient_id") ?? "");
-  const at = parseLocalInput(String(formData.get("scheduled_at") ?? ""));
+  const date = String(formData.get("scheduled_date") ?? "");
+  const time = String(formData.get("scheduled_time") ?? "");
+  const at = parseLocalInput(`${date}T${time}`);
   if (!patientId || !at) return;
   const duration = Math.round(Number(formData.get("duration_min")));
   const price = Number(formData.get("price"));
@@ -185,7 +239,9 @@ export default async function WeekPage({
   const [sessionsRes, patientsRes] = await Promise.all([
     supabaseAdmin
       .from("sessions")
-      .select("id, scheduled_at, duration_min, status, price, patient_id, patients(name)")
+      .select(
+        "id, scheduled_at, duration_min, status, price, patient_id, paid_at, reminder_sent_at, zoom_link_sent_at, payment_email_sent_at, patients(name, email)",
+      )
       .gte("scheduled_at", weekStart.toISOString())
       .lt("scheduled_at", weekEnd.toISOString())
       .order("scheduled_at"),
@@ -235,6 +291,17 @@ export default async function WeekPage({
           שבוע הבא ←
         </Link>
       </div>
+
+      {sp.mail_ok === "1" ? (
+        <p className="mt-4 rounded-lg border border-line bg-sand p-3 text-sm">
+          המייל נשלח.
+        </p>
+      ) : null}
+      {typeof sp.mail_error === "string" && sp.mail_error ? (
+        <p className="mt-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+          {sp.mail_error}
+        </p>
+      ) : null}
 
       {/* New session */}
       <details className="mt-6 rounded-xl border border-line bg-surface p-4">
@@ -306,12 +373,23 @@ export default async function WeekPage({
                             >
                               <input type="hidden" name="id" value={s.id} />
                               <input
-                                type="datetime-local"
-                                name="scheduled_at"
+                                type="date"
+                                name="scheduled_date"
+                                dir="ltr"
                                 required
                                 defaultValue={localInputFormat
                                   .format(new Date(s.scheduled_at))
-                                  .replace(" ", "T")}
+                                  .split(" ")[0]}
+                                className="rounded-lg border border-line bg-surface p-2 text-sm"
+                              />
+                              <input
+                                type="time"
+                                name="scheduled_time"
+                                dir="ltr"
+                                required
+                                defaultValue={localInputFormat
+                                  .format(new Date(s.scheduled_at))
+                                  .split(" ")[1]}
                                 className="rounded-lg border border-line bg-surface p-2 text-sm"
                               />
                               <button type="submit" className={buttonClass}>
@@ -319,7 +397,60 @@ export default async function WeekPage({
                               </button>
                             </form>
                           </details>
+                          {patientOf(s)?.email ? (
+                            <>
+                              <form action={emailReminder}>
+                                <input type="hidden" name="id" value={s.id} />
+                                <input
+                                  type="hidden"
+                                  name="w"
+                                  value={ymdString(sunday)}
+                                />
+                                <button
+                                  type="submit"
+                                  className={quietButtonClass}
+                                >
+                                  תזכורת במייל{s.reminder_sent_at ? " ✓" : ""}
+                                </button>
+                              </form>
+                              <form action={emailZoom}>
+                                <input type="hidden" name="id" value={s.id} />
+                                <input
+                                  type="hidden"
+                                  name="w"
+                                  value={ymdString(sunday)}
+                                />
+                                <button
+                                  type="submit"
+                                  className={quietButtonClass}
+                                >
+                                  קישור זום במייל
+                                  {s.zoom_link_sent_at ? " ✓" : ""}
+                                </button>
+                              </form>
+                            </>
+                          ) : null}
                         </div>
+                      ) : null}
+                      {s.status === "done" &&
+                      !s.paid_at &&
+                      patientOf(s)?.email ? (
+                        <form action={emailPaymentRequest} className="mt-3">
+                          <input
+                            type="hidden"
+                            name="patient_id"
+                            value={s.patient_id}
+                          />
+                          <input
+                            type="hidden"
+                            name="w"
+                            value={ymdString(sunday)}
+                          />
+                          <button type="submit" className={quietButtonClass}>
+                            בקשת תשלום במייל
+                            {s.payment_email_sent_at ? " ✓" : ""}
+                          </button>
+                        </form>
                       ) : null}
                     </li>
                   ))}

@@ -1,5 +1,4 @@
 // Shared bits for the patients admin pages only.
-import { PAYMENT_METHODS } from "@/lib/morning";
 
 export type Patient = {
   id: string;
@@ -8,10 +7,10 @@ export type Patient = {
   phone: string | null;
   email: string | null;
   rate: number;
-  payment_method: string | null;
   notes: string | null;
   reminders_enabled: boolean;
   chase_enabled: boolean;
+  zoom_enabled: boolean;
   weekly_day: number | null;
   weekly_time: string | null;
   weekly_active: boolean;
@@ -82,22 +81,15 @@ export function sessionStatusBadge(status: string) {
   return base + "border border-accent-deep text-accent-deep";
 }
 
-export function paymentMethodLabel(method: string | null) {
-  if (method && method in PAYMENT_METHODS) {
-    return PAYMENT_METHODS[method as keyof typeof PAYMENT_METHODS].label;
-  }
-  return method || "—";
-}
-
 export type PatientInput = {
   name: string;
   phone: string | null;
   email: string | null;
   rate: number;
-  payment_method: string | null;
   notes: string | null;
   reminders_enabled: boolean;
   chase_enabled: boolean;
+  zoom_enabled: boolean;
   weekly_day: number | null;
   weekly_time: string | null;
   weekly_active: boolean;
@@ -116,7 +108,6 @@ export function patientFromForm(
   if (!name) return { ok: false, error: "יש להזין שם." };
 
   const rateNum = Math.round(Number(formData.get("rate") || 0) * 100) / 100;
-  const method = String(formData.get("payment_method") ?? "");
 
   const weeklyDayRaw = String(formData.get("weekly_day") ?? "");
   const weekly_day = /^[0-6]$/.test(weeklyDayRaw) ? Number(weeklyDayRaw) : null;
@@ -130,10 +121,10 @@ export function patientFromForm(
       phone: str("phone"),
       email: str("email"),
       rate: Number.isFinite(rateNum) && rateNum >= 0 ? rateNum : 0,
-      payment_method: method in PAYMENT_METHODS ? method : null,
       notes: str("notes"),
       reminders_enabled: formData.get("reminders_enabled") === "on",
       chase_enabled: formData.get("chase_enabled") === "on",
+      zoom_enabled: formData.get("zoom_enabled") === "on",
       weekly_day,
       weekly_time,
       // Active only makes sense with a complete slot.

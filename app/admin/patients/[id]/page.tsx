@@ -3,7 +3,7 @@ import { revalidatePath } from "next/cache";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { createReceipt, PAYMENT_METHODS } from "@/lib/morning";
-import { onSessionDone } from "@/lib/notify";
+import { sendPaymentRequest } from "@/lib/notify";
 import { supabaseAdmin } from "@/lib/supabase";
 import { formatDate } from "../../helpers";
 import PatientForm from "../PatientForm";
@@ -15,7 +15,6 @@ import {
   inputClass,
   owedBadgeClass,
   patientFromForm,
-  paymentMethodLabel,
   sessionStatusBadge,
   sessionStatusLabel,
   type Patient,
@@ -71,32 +70,47 @@ export default async function PatientPage({
         `/admin/patients/${id}?error=${encodeURIComponent(parsed.error)}`,
       );
     }
-    await supabaseAdmin.from("patients").update(parsed.data).eq("id", id);
+    const { error } = await supabaseAdmin
+      .from("patients")
+      .update(parsed.data)
+      .eq("id", id);
+    if (error) {
+      redirect(
+        `/admin/patients/${id}?error=${encodeURIComponent(
+          `השמירה נכשלה: ${error.message}`,
+        )}`,
+      );
+    }
     revalidatePath("/admin/patients");
     revalidatePath(`/admin/patients/${id}`);
     redirect(`/admin/patients/${id}?saved=1`);
   }
 
+  // "סיום פגישה" only records the fact — it never emails anyone. Payment
+  // requests go out via the explicit button (requestPayment).
   async function finishSession(formData: FormData) {
     "use server";
     const sessionId = String(formData.get("session_id") ?? "");
     // planned-only guard: a double submit cannot mark done twice.
-    const { data } = await supabaseAdmin
+    await supabaseAdmin
       .from("sessions")
       .update({ status: "done", done_at: new Date().toISOString() })
       .eq("id", sessionId)
       .eq("patient_id", id)
-      .eq("status", "planned")
-      .select("id");
-    if (data && data.length > 0) {
-      try {
-        await onSessionDone(sessionId);
-      } catch {
-        // Notifications must never fail the action.
-      }
-    }
+      .eq("status", "planned");
     revalidatePath("/admin/patients");
     revalidatePath(`/admin/patients/${id}`);
+  }
+
+  async function requestPayment() {
+    "use server";
+    const outcome = await sendPaymentRequest(id);
+    revalidatePath(`/admin/patients/${id}`);
+    redirect(
+      outcome.sent
+        ? `/admin/patients/${id}?mail_ok=1`
+        : `/admin/patients/${id}?mail_error=${encodeURIComponent(outcome.reason)}`,
+    );
   }
 
   async function updateSession(formData: FormData) {
@@ -197,7 +211,6 @@ export default async function PatientPage({
 
   const infoLine = [
     p.rate ? `תעריף: ${formatILS(Number(p.rate))}` : null,
-    p.payment_method ? `תשלום: ${paymentMethodLabel(p.payment_method)}` : null,
     weeklySlot,
   ].filter(Boolean);
 
@@ -266,6 +279,16 @@ export default async function PatientPage({
           {sp.paid_error}
         </p>
       ) : null}
+      {sp.mail_ok === "1" ? (
+        <p className="mt-4 rounded-lg border border-line bg-sand p-3 text-sm">
+          בקשת התשלום נשלחה במייל.
+        </p>
+      ) : null}
+      {typeof sp.mail_error === "string" && sp.mail_error ? (
+        <p className="mt-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+          {sp.mail_error}
+        </p>
+      ) : null}
 
       {/* Balance summary */}
       <section className="mt-6 grid grid-cols-3 gap-3 text-center">
@@ -288,6 +311,24 @@ export default async function PatientPage({
           <div className="text-sm text-ink-muted">שולם עד היום</div>
         </div>
       </section>
+
+      {/* Manual payment request */}
+      {unpaid.length > 0 && p.email ? (
+        <section className="mt-6 rounded-xl border border-line bg-surface p-4">
+          <h2 className="font-heading text-lg font-bold">בקשת תשלום</h2>
+          <p className="mt-2 text-sm text-ink-muted">
+            מייל אל {p.email} עם היתרה ({formatILS(owedTotal)}) וכל אפשרויות
+            התשלום. נשלח רק בלחיצה — סימון פגישה כ&quot;בוצעה&quot; לא שולח
+            כלום. אם לא שולם תוך 48 שעות מהבקשה, נשלחת תזכורת עדינה אחת
+            (אפשר לכבות במרדף תשלום).
+          </p>
+          <form action={requestPayment} className="mt-3">
+            <button type="submit" className={buttonClass}>
+              שליחת בקשת תשלום במייל
+            </button>
+          </form>
+        </section>
+      ) : null}
 
       {/* Mark paid + receipt */}
       {unpaid.length > 0 ? (
@@ -320,11 +361,7 @@ export default async function PatientPage({
               <select
                 id="pay_method"
                 name="payment_method"
-                defaultValue={
-                  p.payment_method && p.payment_method in PAYMENT_METHODS
-                    ? p.payment_method
-                    : "bit"
-                }
+                defaultValue="bit"
                 className={inputClass}
               >
                 {Object.entries(PAYMENT_METHODS).map(([value, { label }]) => (

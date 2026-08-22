@@ -1,4 +1,4 @@
-import { emailHtml, sendEmail } from "@/lib/email";
+import { sendZoomLink } from "@/lib/notify";
 import { supabaseAdmin } from "@/lib/supabase";
 
 // Every-few-minutes sweep: Zoom link shortly before the session starts.
@@ -14,41 +14,19 @@ export async function GET() {
 
   const { data: starting, error } = await supabaseAdmin
     .from("sessions")
-    .select("id, patients(name, email, reminders_enabled)")
+    .select("id, patients(email, zoom_enabled)")
     .eq("status", "planned")
     .is("zoom_link_sent_at", null)
     .gt("scheduled_at", now.toISOString())
     .lte("scheduled_at", in12min.toISOString());
   if (error) console.error("frequent zoom query failed:", error.message);
 
-  const zoomUrl = process.env.MOR_ZOOM_URL;
-
   for (const s of starting ?? []) {
     const p = Array.isArray(s.patients) ? s.patients[0] : s.patients;
-    if (!p?.email || !p.reminders_enabled) continue;
-    if (!zoomUrl) {
-      console.log("[frequent] MOR_ZOOM_URL missing, skipping zoom link email");
-      skipped++;
-      continue;
-    }
-    const result = await sendEmail({
-      to: p.email,
-      subject: "הקישור לפגישה שלנו",
-      html: emailHtml([
-        `שלום ${p.name},`,
-        `הקישור לפגישה שלנו: <a href="${zoomUrl}">${zoomUrl}</a>`,
-        "נתראה עוד מעט!",
-      ]),
-    });
-    if ("ok" in result) {
-      await supabaseAdmin
-        .from("sessions")
-        .update({ zoom_link_sent_at: new Date().toISOString() })
-        .eq("id", s.id);
-      sent++;
-    } else {
-      skipped++;
-    }
+    if (!p?.email || !p.zoom_enabled) continue;
+    const result = await sendZoomLink(s.id);
+    if (result.sent) sent++;
+    else skipped++;
   }
 
   return Response.json({ sent, skipped });

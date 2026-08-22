@@ -1,8 +1,10 @@
 import { emailHtml, paymentParagraphs, sendEmail } from "@/lib/email";
-import { unpaidTotalFor } from "@/lib/notify";
+import { sendSessionReminder, unpaidTotalFor } from "@/lib/notify";
 import { supabaseAdmin } from "@/lib/supabase";
 
-// Hourly sweeps: 26h session reminders + 48h payment chase.
+// Hourly sweeps: 26h session reminders + payment chase. The chase fires only
+// for sessions whose payment REQUEST went out (payment_email_sent_at) 48h+
+// ago and is still unpaid — marking a session done never emails anyone.
 // Idempotent via reminder_sent_at / chase_sent_at, so no auth needed —
 // repeated calls are no-ops. If that ever changes, add a CRON_SECRET check
 // (require Authorization: Bearer $CRON_SECRET).
@@ -15,15 +17,6 @@ function patientOf(p: PatientRef | PatientRef[]): PatientRef {
   return Array.isArray(p) ? (p[0] ?? null) : p;
 }
 
-const whenFormat = new Intl.DateTimeFormat("he-IL", {
-  timeZone: "Asia/Jerusalem",
-  weekday: "long",
-  day: "numeric",
-  month: "long",
-  hour: "2-digit",
-  minute: "2-digit",
-});
-
 export async function GET() {
   let sent = 0;
   let skipped = 0;
@@ -33,9 +26,7 @@ export async function GET() {
   const in26h = new Date(now.getTime() + 26 * 60 * 60 * 1000);
   const { data: upcoming, error: upErr } = await supabaseAdmin
     .from("sessions")
-    .select(
-      "id, scheduled_at, cancel_token, patients(name, email, reminders_enabled)",
-    )
+    .select("id, patients(name, email, reminders_enabled)")
     .eq("status", "planned")
     .is("reminder_sent_at", null)
     .gt("scheduled_at", now.toISOString())
@@ -45,29 +36,12 @@ export async function GET() {
   for (const s of upcoming ?? []) {
     const p = patientOf(s.patients);
     if (!p?.email || !p.reminders_enabled) continue;
-    const when = whenFormat.format(new Date(s.scheduled_at));
-    const result = await sendEmail({
-      to: p.email,
-      subject: "תזכורת לפגישה שלנו",
-      html: emailHtml([
-        `שלום ${p.name},`,
-        `רק תזכורת קטנה — הפגישה שלנו מתקיימת ב${when}.`,
-        `אם משהו השתנה אפשר לבטל <a href="https://www.mor-klein.co.il/cancel/${s.cancel_token}">כאן</a>.`,
-        "נתראה!",
-      ]),
-    });
-    if ("ok" in result) {
-      await supabaseAdmin
-        .from("sessions")
-        .update({ reminder_sent_at: new Date().toISOString() })
-        .eq("id", s.id);
-      sent++;
-    } else {
-      skipped++;
-    }
+    const result = await sendSessionReminder(s.id);
+    if (result.sent) sent++;
+    else skipped++;
   }
 
-  // (b) 48h payment chase for done, unpaid sessions.
+  // (b) One-time chase, 48h after a payment request that is still unpaid.
   const cutoff48h = new Date(now.getTime() - 48 * 60 * 60 * 1000);
   const { data: unpaid, error: unpErr } = await supabaseAdmin
     .from("sessions")
@@ -75,7 +49,8 @@ export async function GET() {
     .eq("status", "done")
     .is("paid_at", null)
     .is("chase_sent_at", null)
-    .lt("done_at", cutoff48h.toISOString());
+    .not("payment_email_sent_at", "is", null)
+    .lt("payment_email_sent_at", cutoff48h.toISOString());
   if (unpErr) console.error("hourly chase query failed:", unpErr.message);
 
   for (const s of unpaid ?? []) {

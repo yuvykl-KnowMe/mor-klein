@@ -1,4 +1,3 @@
-import { PAYMENT_METHODS } from "@/lib/morning";
 import { buttonClass, DAY_NAMES, inputClass, type Patient } from "./helpers";
 
 export default function PatientForm({
@@ -55,43 +54,20 @@ export default function PatientForm({
         </div>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2">
-        <div>
-          <label htmlFor="rate" className="block text-sm text-ink-muted">
-            תעריף לפגישה (₪)
-          </label>
-          <input
-            id="rate"
-            name="rate"
-            type="number"
-            inputMode="decimal"
-            min="0"
-            step="0.01"
-            defaultValue={defaults.rate ?? ""}
-            className={inputClass}
-          />
-        </div>
-        <div>
-          <label
-            htmlFor="payment_method"
-            className="block text-sm text-ink-muted"
-          >
-            אופן תשלום
-          </label>
-          <select
-            id="payment_method"
-            name="payment_method"
-            defaultValue={defaults.payment_method ?? ""}
-            className={inputClass}
-          >
-            <option value="">—</option>
-            {Object.entries(PAYMENT_METHODS).map(([value, { label }]) => (
-              <option key={value} value={value}>
-                {label}
-              </option>
-            ))}
-          </select>
-        </div>
+      <div>
+        <label htmlFor="rate" className="block text-sm text-ink-muted">
+          תעריף לפגישה (₪)
+        </label>
+        <input
+          id="rate"
+          name="rate"
+          type="number"
+          inputMode="decimal"
+          min="0"
+          step="0.01"
+          defaultValue={defaults.rate ?? ""}
+          className={inputClass}
+        />
       </div>
 
       <div>
@@ -123,6 +99,14 @@ export default function PatientForm({
             defaultChecked={defaults.chase_enabled ?? true}
           />
           מרדף תשלום
+        </label>
+        <label className="flex items-center gap-2 text-sm">
+          <input
+            type="checkbox"
+            name="zoom_enabled"
+            defaultChecked={defaults.zoom_enabled ?? true}
+          />
+          מייל קישור זום לפני פגישה
         </label>
       </div>
 

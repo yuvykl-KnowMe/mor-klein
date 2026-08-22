@@ -60,11 +60,12 @@ ${body}
 </div>`;
 }
 
-/** Shared payment-request paragraphs (payment-due email + 48h chase). */
+/** Shared payment-request paragraphs (payment-request email + 48h chase). */
 export function paymentParagraphs(total: number): string[] {
   return [
     `היתרה לתשלום כרגע היא <strong>${total} ₪</strong>.`,
-    `אפשר לשלם בביט או בפייבוקס למספר ${PHONE_DISPLAY}.`,
-    "אם נוח לך אחרת — אפשר לתאם איתי.",
+    "אפשר לשלם בכל אחת מהדרכים:",
+    `ביט או פייבוקס למספר ${PHONE_DISPLAY}<br/>` +
+      "העברה בנקאית: בנק הפועלים, סניף 584, חשבון 5670, על שם מור קליין",
   ];
 }

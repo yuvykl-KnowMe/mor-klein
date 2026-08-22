@@ -50,17 +50,33 @@ export function NewSessionForm({
           ))}
         </select>
       </div>
-      <div>
-        <label htmlFor="ns-when" className="block text-sm text-ink-muted">
-          תאריך ושעה
-        </label>
-        <input
-          id="ns-when"
-          name="scheduled_at"
-          type="datetime-local"
-          required
-          className={inputClass}
-        />
+      <div className="flex gap-3">
+        <div className="flex-1">
+          <label htmlFor="ns-date" className="block text-sm text-ink-muted">
+            תאריך
+          </label>
+          <input
+            id="ns-date"
+            name="scheduled_date"
+            type="date"
+            dir="ltr"
+            required
+            className={inputClass}
+          />
+        </div>
+        <div className="flex-1">
+          <label htmlFor="ns-time" className="block text-sm text-ink-muted">
+            שעה
+          </label>
+          <input
+            id="ns-time"
+            name="scheduled_time"
+            type="time"
+            dir="ltr"
+            required
+            className={inputClass}
+          />
+        </div>
       </div>
       <div className="flex gap-3">
         <div className="flex-1">

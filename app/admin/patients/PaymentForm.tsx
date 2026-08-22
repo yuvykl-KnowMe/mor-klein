@@ -124,7 +124,7 @@ export default function PaymentForm({
 
       <div>
         <label htmlFor="pay_date" className="block text-sm text-ink-muted">
-          תאריך קבלת התשלום — יופיע על הקבלה
+          תאריך קבלת התשלום
         </label>
         <input
           id="pay_date"
@@ -132,11 +132,18 @@ export default function PaymentForm({
           type="date"
           dir="ltr"
           required
+          max={new Intl.DateTimeFormat("en-CA", {
+            timeZone: "Asia/Jerusalem",
+          }).format(new Date())}
           defaultValue={new Intl.DateTimeFormat("en-CA", {
             timeZone: "Asia/Jerusalem",
           }).format(new Date())}
           className={inputClass}
         />
+        <p className="mt-1 text-sm text-ink-muted">
+          יירשם בשורת התשלום שבקבלה. הקבלה עצמה מתוארכת להיום — כללי רציפות
+          של מסמכי מס לא מאפשרים לתארך אותה אחורה.
+        </p>
       </div>
 
       <div>

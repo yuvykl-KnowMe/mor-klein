@@ -205,11 +205,17 @@ export default async function PatientPage({
       return back("יש להזין את הסכום שהתקבל בפועל.");
     }
 
-    // The receipt is dated when the money was received, not when Mor got
-    // around to recording it.
+    // Goes on the receipt's payment row (the document itself is dated today —
+    // sequential-numbering rules forbid backdating it).
     const paidDate = String(formData.get("paid_date") ?? "");
     if (!/^\d{4}-\d{2}-\d{2}$/.test(paidDate)) {
       return back("יש לבחור את תאריך קבלת התשלום.");
+    }
+    const todayIL = new Intl.DateTimeFormat("en-CA", {
+      timeZone: "Asia/Jerusalem",
+    }).format(new Date());
+    if (paidDate > todayIL) {
+      return back("תאריך קבלת התשלום לא יכול להיות עתידי.");
     }
 
     const picked = formData.getAll("session_ids").map(String).filter(Boolean);

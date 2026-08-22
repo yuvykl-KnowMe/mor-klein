@@ -59,17 +59,18 @@ export type Receipt = { id: string; number: number; url: string };
 /** Creates a real receipt (type 400) in Mor's Morning bookkeeping. */
 export async function createReceipt(input: ReceiptInput): Promise<Receipt> {
   const method = PAYMENT_METHODS[input.paymentMethod];
-  // Receipt date = when the money was received. Falls back to today in
-  // Asia/Jerusalem, formatted YYYY-MM-DD (en-CA gives ISO order).
-  const date =
-    input.date ??
-    new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Jerusalem" }).format(
-      new Date(),
-    );
+  // Document date is ALWAYS today: Israeli sequential-numbering rules forbid
+  // dating a receipt before the previously issued one, and Morning enforces
+  // that ("התאריך שנבחר עתידי או מוקדם מדי"). The date the money was actually
+  // received goes on the payment row inside the receipt instead.
+  const today = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Jerusalem",
+  }).format(new Date());
+  const paymentDate = input.date ?? today;
 
   const body = {
     type: RECEIPT_TYPE,
-    date,
+    date: today,
     lang: "he",
     currency: "ILS",
     vatType: DOC_VAT_EXEMPT,
@@ -94,7 +95,7 @@ export async function createReceipt(input: ReceiptInput): Promise<Receipt> {
     ],
     payment: [
       {
-        date,
+        date: paymentDate,
         type: method.type,
         ...("appType" in method ? { appType: method.appType } : {}),
         price: input.amount,

@@ -86,8 +86,9 @@ const HORIZON_WEEKS = 4;
 /**
  * Ensure every weekly-active patient has a planned session for each of the
  * next HORIZON_WEEKS occurrences of their weekly slot. Idempotent: a week
- * (Sunday–Saturday, Israel time) that already holds ANY non-canceled session
- * for the patient is skipped — this respects manually moved sessions.
+ * (Sunday–Saturday, Israel time) that already holds ANY session for the
+ * patient — planned, done, or canceled — is skipped, which respects both
+ * manually moved sessions and cancellations.
  * Returns the number of sessions inserted.
  */
 export async function generatePlannedSessions(): Promise<number> {
@@ -108,10 +109,12 @@ export async function generatePlannedSessions(): Promise<number> {
   const rangeStart = zonedToUtc(weekStart.y, weekStart.m, weekStart.d, 0, 0);
   const rangeEnd = zonedToUtc(rangeEndDay.y, rangeEndDay.m, rangeEndDay.d, 0, 0);
 
+  // Canceled sessions COUNT as handled: canceling means "no session that
+  // week". Excluding them here made cancel re-trigger the generator on the
+  // next render, spawning an endless run of canceled + fresh planned rows.
   const { data: existing, error: exErr } = await supabaseAdmin
     .from("sessions")
     .select("patient_id, scheduled_at")
-    .neq("status", "canceled")
     .gte("scheduled_at", rangeStart.toISOString())
     .lt("scheduled_at", rangeEnd.toISOString())
     .in(

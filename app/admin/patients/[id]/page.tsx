@@ -120,6 +120,38 @@ export default async function PatientPage({
     revalidatePath(`/admin/patients/${id}`);
   }
 
+  // Undo for "סיום פגישה" / cancel. Blocked once paid — a real Morning
+  // receipt exists by then.
+  async function revertToPlanned(formData: FormData) {
+    "use server";
+    const sessionId = String(formData.get("session_id") ?? "");
+    if (!sessionId) return;
+    await supabaseAdmin
+      .from("sessions")
+      .update({ status: "planned", done_at: null })
+      .eq("id", sessionId)
+      .eq("patient_id", id)
+      .is("paid_at", null);
+    revalidatePath("/admin/patients");
+    revalidatePath(`/admin/patients/${id}`);
+    revalidatePath("/admin/week");
+  }
+
+  /** Undo for "שולם בעבר (בלי קבלה)" — only when no receipt was issued. */
+  async function unmarkPaid(formData: FormData) {
+    "use server";
+    const sessionId = String(formData.get("session_id") ?? "");
+    if (!sessionId) return;
+    await supabaseAdmin
+      .from("sessions")
+      .update({ paid_at: null })
+      .eq("id", sessionId)
+      .eq("patient_id", id)
+      .is("receipt_id", null);
+    revalidatePath("/admin/patients");
+    revalidatePath(`/admin/patients/${id}`);
+  }
+
   async function requestPayment() {
     "use server";
     const outcome = await sendPaymentRequest(id);
@@ -477,6 +509,28 @@ export default async function PatientPage({
                         className="rounded-lg border border-line bg-surface px-3 py-1.5 text-sm hover:bg-sand"
                       >
                         שולם בעבר (בלי קבלה)
+                      </button>
+                    </form>
+                  ) : null}
+                  {s.status !== "planned" && !s.paid_at ? (
+                    <form action={revertToPlanned}>
+                      <input type="hidden" name="session_id" value={s.id} />
+                      <button
+                        type="submit"
+                        className="rounded-lg border border-line bg-surface px-3 py-1.5 text-sm hover:bg-sand"
+                      >
+                        ↩ החזרה למתוכננת
+                      </button>
+                    </form>
+                  ) : null}
+                  {s.paid_at && !s.receipt_id ? (
+                    <form action={unmarkPaid}>
+                      <input type="hidden" name="session_id" value={s.id} />
+                      <button
+                        type="submit"
+                        className="rounded-lg border border-line bg-surface px-3 py-1.5 text-sm hover:bg-sand"
+                      >
+                        ↩ ביטול סימון תשלום
                       </button>
                     </form>
                   ) : null}

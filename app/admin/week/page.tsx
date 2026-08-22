@@ -179,6 +179,39 @@ async function emailPaymentRequest(formData: FormData) {
   mailRedirect(week, await sendPaymentRequest(patientId));
 }
 
+/**
+ * Undo for "בוצעה" / "ביטול" — puts the session back to planned. Refuses once
+ * money is involved (paid_at set): a real Morning receipt already exists, so
+ * un-doing it here would silently disagree with Mor's bookkeeping.
+ */
+async function revertToPlanned(formData: FormData) {
+  "use server";
+  const id = String(formData.get("id") ?? "");
+  if (!id) return;
+  await supabaseAdmin
+    .from("sessions")
+    .update({ status: "planned", done_at: null })
+    .eq("id", id)
+    .is("paid_at", null);
+  revalidatePath("/admin/week");
+  revalidatePath("/admin/patients");
+}
+
+/** Deletes a canceled session outright — for junk/test rows. Canceled only:
+ *  nothing happened and no money moved, so there is nothing to lose. */
+async function deleteCanceled(formData: FormData) {
+  "use server";
+  const id = String(formData.get("id") ?? "");
+  if (!id) return;
+  await supabaseAdmin
+    .from("sessions")
+    .delete()
+    .eq("id", id)
+    .eq("status", "canceled");
+  revalidatePath("/admin/week");
+  revalidatePath("/admin/patients");
+}
+
 async function markCanceled(formData: FormData) {
   "use server";
   const id = String(formData.get("id") ?? "");
@@ -486,6 +519,35 @@ export default async function WeekPage({
                             {s.payment_email_sent_at ? " ✓" : ""}
                           </ConfirmButton>
                         </form>
+                      ) : null}
+                      {/* Undo lane — every status change stays reversible. */}
+                      {s.status !== "planned" ? (
+                        <div className="mt-3 flex flex-wrap items-center gap-2">
+                          {s.paid_at ? (
+                            <span className="text-sm text-ink-muted">
+                              שולמה והופקה קבלה — לא ניתן להחזיר. לתיקון יש
+                              לטפל בקבלה בהנהלת החשבונות.
+                            </span>
+                          ) : (
+                            <form action={revertToPlanned}>
+                              <input type="hidden" name="id" value={s.id} />
+                              <button type="submit" className={quietButtonClass}>
+                                ↩ החזרה למתוכננת
+                              </button>
+                            </form>
+                          )}
+                          {s.status === "canceled" ? (
+                            <form action={deleteCanceled}>
+                              <input type="hidden" name="id" value={s.id} />
+                              <ConfirmButton
+                                message={`למחוק לצמיתות את הפגישה שבוטלה של ${patientName(s)}?`}
+                                className={quietButtonClass}
+                              >
+                                מחיקה
+                              </ConfirmButton>
+                            </form>
+                          ) : null}
+                        </div>
                       ) : null}
                     </li>
                   ))}

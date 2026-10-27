@@ -12,6 +12,10 @@ export const BOOKING_URL = "https://cal.com/mor-klein/intro";
 // Display form for humans, tel: form for one-tap dialing on mobile.
 export const PHONE_DISPLAY = "054-205-4105";
 export const PHONE_TEL = "+972542054105";
+// WhatsApp click-to-chat: opens WhatsApp with a prefilled message to Mor.
+export const WHATSAPP_URL = `https://wa.me/972542054105?text=${encodeURIComponent(
+  "היי מור, אשמח לשמוע עוד ולתאם שיחת היכרות",
+)}`;
 
 // Professional titles — copy rule: never use the word "psychologist" in Hebrew.
 // Credential abbreviation is M.A.: Mor's Bar-Ilan M.A. in social work

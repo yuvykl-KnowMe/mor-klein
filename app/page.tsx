@@ -32,10 +32,11 @@ const jsonLd = {
       telephone: PHONE_TEL,
       priceRange: "₪₪",
       description:
-        "פסיכותרפיה אדלריאנית- ליווי אישי בזום בכל הארץ ובקליניקה בהרצליה, בצמתים של קריירה, זוגיות והורות צעירה. שיחת היכרות ראשונה ללא עלות.",
+        "פסיכותרפיה אדלריאנית- ליווי אישי בזום בכל הארץ ובקליניקה בהרצליה, בצמתים של שינוי בחיים, קריירה, זוגיות והורות צעירה, בטיפול אישי למבוגרים. שיחת היכרות ראשונה ללא עלות.",
       serviceType: [
         "פסיכותרפיה אדלריאנית",
-        "ליווי זוגי",
+        "ליווי אישי בנושאי זוגיות",
+        "ליווי בשינוי בחיים",
         "ליווי בהורות צעירה",
         "ליווי בהתלבטויות קריירה",
       ],
@@ -52,9 +53,12 @@ const jsonLd = {
       },
       knowsLanguage: "he",
       availableLanguage: "he",
-      // Placeholder — fill with directory profile URLs (Hebpsy, Google Business,
-      // etc.) once those exist.
-      sameAs: [],
+      // Social/directory profiles. Add the Google Business Profile URL once it
+      // is verified and has a public link.
+      sameAs: [
+        "https://www.facebook.com/profile.php?id=61595797093748",
+        "https://www.linkedin.com/in/mor-klein/",
+      ],
       founder: { "@id": `${SITE_URL}/#person` },
     },
     {
